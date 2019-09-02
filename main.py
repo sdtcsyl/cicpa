@@ -3,112 +3,81 @@
 Created on Sun Jun 23 22:26:58 2019
 """
 
-import requests 
-import time
-import re
+import cicpa
+import requester as rq
 import database as db
 import files as Files
 import pandas as pd
+from lxml import etree
+import time
+import random
 
-class cicpa:
-    def __init__(self):        
-        self.url = 'http://cmispub.cicpa.org.cn/cicpa2_web/OfficeIndexAction.do'
-        
-        self.cookie = {
-        'cookiee':'20111116',
-        'JSESSIONID': '849A9A1D4DF6D59846E8E407C35FA5B8'
-        }   #please amend
-
-        self.header = {
-        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
-        'Accept-Encoding': 'gzip, deflate',
-        'Accept-Language' : 'en-US, en; q=0.8, zh-Hans-CN; q=0.7, zh-Hans; q=0.5, zh-Hant-HK; q=0.3, zh-Hant; q=0.2',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',       
-        'Content-Length' : '114',
-        'Content-Type' : 'application/x-www-form-urlencoded',
-        'Host': 'cmispub.cicpa.org.cn',
-        'Referer': 'http://cmispub.cicpa.org.cn/cicpa2_web/OfficeIndexAction.do',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
-        }
-
-
-def func_data(scope, pagenum):
-    data = {        
-       'ascGuid' : scope,   
-       'isStock' : '00',
-       'method' : 'indexQuery',   
-       'offAllcode' : None,        
-       'offName' : None,   
-       'pageNum' : str(pagenum),
-       'pageSize' : None, 
-       'personNum' : None, 
-       'queryType' : '1'        
-            }
-    return data
-
-def func_request_data(url, header, cookie, data):
-    try:
-        req = requests.post(url, headers = header, cookies = cookie, data = data, timeout = 300)
-    except requests.ConnectionError:    #if the internet is not steable
-                internet = True
-                while internet:
-                    try:
-                       time.sleep(600) #retry after timeout
-                       req = requests.get(url, headers = header, cookies = cookie, data = data, timeout = 300)
-                    except requests.ConnectionError:    #if the internet is not steable
-                        pass
-                    else:
-                        internet =False
-    finally:
-            return req
-def func_re(data):
-    dt = re.findall(r'<td[^>]*>([^<]*)</td>[\n\s]*<td[^>]*><a\shref="([^"]*)">([^<]*)</a></td>[\n\s]*<[^>]*>([^<]*)</td>[\n\s]*<[^>]*>([^<]*)</td>[\n\s]*<[^>]*>([^<]*)</td>', data, re.S)
-    return dt
-
-def func_viewDetail():
-    js = '''function viewDetail(guid,code){
-	    //guid=guid+","+code;
-	   
-		var url = "";
-		if('1'=='1' || '1'=='4'){
-			guid=guid+","+code;
-			if(code!=null&&code.length>8)
-				url = "/cicpa2_web/002/"+guid+"/1.shtml";
-			else
-				url = "/cicpa2_web/002/"+guid+"/7.shtml";
-				
-			window.open(url);
-		}else if('1'=='2'){
-			url = "/cicpa2_web/003/"+guid+".shtml";
-							
-			
-			window.open(url);
-		}else{
-			url = "/cicpa2_web/004/"+guid+".shtml";
-							
-			
-			window.open(url);
-		}
-	}  '''
+def main_table_main(date):  
+    cicpa_firm = cicpa.cicpa()
+    rq_main = rq.request_main()
+    db_main = db.table_main(date)
     
-    url = 'http://cmispub.cicpa.org.cn/'
-        
-def main():
-    cicpa_firm = cicpa()
-    qg = '0000010F84968440E06B4F9F27A6E22A'
-    for i in range(1,48,1):
-        data = func_data(qg, i)
-        req = func_request_data(cicpa_firm.url, cicpa_firm.header, cicpa_firm.cookie, data)
-        #save_shtml(page, req.text)
-        req_dts = func_re(req.text)
-        for req_dt in req_dts:
-            db.sqlwrite(tuple(req_dt)+(i,0),'bjkjssws')
-        #time.sleep(30)
-        
-    output = db.sqloutput('bjkjssws')
-    output_excel = pd.DataFrame(output,columns = ['No', 'Web', 'Name', 'Address', 'Contact', 'Tel', 'Page', 'NY'])
-    output_excel.to_excel(Files.db_path + 'bjkjssws.xlsx',index=False)
+    for count in range(1,4,1): #循环4次用于检查是否有遗漏
+        for key in cicpa_firm.locations:
+            if key != '全部':
+                req = rq_main.func_request_main_post(cicpa_firm.locations[key], 1)
+                nums, pages, page = rq_main.func_re_main_nums(req.text)
+                counts = db_main.func_count_by_sf(key)
+                if counts != int(nums):
+                    for i in range(1, int(pages)+1,1):
+                        req = rq_main.func_request_main_post(cicpa_firm.locations[key], i)
+                        req_dts = rq_main.func_re_main(req.text)
+                        for req_dt in req_dts:
+                            db_main.func_write_table((tuple(req_dt)+(key, i) +(0,)*36))
+                        time.sleep(random.randrange(1,10))
+
+
+def main_table_basic(date):
+    rq_basic = rq.request_basic()
+    db_main = db.table_main(date)
+    db_basic = db.table_basic(date)    
+    db_qualifications = db.table_qualifications(date)
+    db_overseascpa = db.table_overseascpa(date)
+    db_subsidiaries = db.table_subsidiaries(date)
+    db_subinfo = db.table_subinfo(date)
+    
+    selections = db_main.func_select_swsbm_web()
+    #selections.reverse()
+    for selection in selections:
+        guid = selection[1].split("'")[1]
+        code = selection[1].split("'")[3]
+        req = rq_basic.func_get(guid, code)
+        data = req.text
+        if '分所编号' in data:
+            sub_info, data = rq_basic.func_parse_sub(data)
+            db_subinfo.func_write_table((selection[0],)+sub_info)
+        else:
+            info, data = rq_basic.func_parse_basic_p_basic(data)
+            db_basic.func_write_table(info)
+            
+            infos, data = rq_basic.func_parse_basic_p_subsidiaries(data)
+            for ifo in infos:
+                db_subsidiaries.func_write_table((selection[0],selection[0]+'_'+ifo[0],)+ifo)
+            db_main.func_update(selection[0],'no_subsidiaries',len(infos))
+            
+            infos, data = rq_basic.func_parse_basic_p_qualifications(data)
+            for ifo in infos:
+                db_qualifications.func_write_table((selection[0],selection[0]+'_'+ifo[0],)+ifo)
+            db_main.func_update(selection[0],'no_qualifications',len(infos))
+    
+            infos, data = rq_basic.func_parse_basic_p_overseascpa(data)
+            for ifo in infos:
+                db_overseascpa.func_write_table((selection[0],selection[0]+'_'+ifo[0],)+ifo)
+            db_main.func_update(selection[0],'no_overseasCPA',len(infos))
+        if len(data)  > 30:
+            with open(selection[0]+".txt", "w", encoding='utf-8') as text_file:
+                text_file.write(data)
+            
+#    output = db.sqloutput('bjkjssws')
+#    output_excel = pd.DataFrame(output,columns = ['No', 'Web', 'Name', 'Address', 'Contact', 'Tel', 'Page', 'NY'])
+#    output_excel.to_excel(Files.db_path + 'bjkjssws.xlsx',index=False)
         
 if __name__ =='__main__' :
-    main()
+    date = '20190829'
+    main_table_basic(date)
+    
