@@ -382,7 +382,95 @@ class table_subinfo(table):
         #self.add_foreign_key('gsbm','main','swsbm')
         self.exe_sql(self.sql_create_table())
 
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+   
+class table_cpa(table):
+    def __init__(self, db):
+        super(table_cpa,self).__init__(db,'cpa')
+        self.fields = ['gsbm',##公司编号
+                        'id', 
+                        'bh',##编号
+                        'web_xm', ##
+                        'xm', ##姓名
+                        'rybh', ##人员编号
+                        
+                        'xb', ##性别
+                        'csrq', ##出生日期
+                        'qkhgzh' ##全科合格证号（或者考核批准文号） 
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
 
+    def func_select_cpa_from_basic(self):
+        sql = 'select gsbm, web_cpa from table_basic'
+        return self.exe_sql_w_return(sql)
+
+    def func_select_cpa_from_subinfo(self):
+        sql = 'select id, web_cpa from table_subinfo'
+        return self.exe_sql_w_return(sql)
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+  
+class table_partner(table):
+    def __init__(self, db):
+        super(table_partner,self).__init__(db,'partner')
+        self.fields = ['gsbm',##公司编号
+                        'id', 
+                        'bh',##编号
+                        'xm', ##合伙人（股东）姓名
+                        'sfzs', ##是否注师
+                        
+                        'zsbh' ##注师编号
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_partner(self):
+        sql = 'select gsbm, web_partner from table_basic'
+        return self.exe_sql_w_return(sql)
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+  
+class table_staff(table):
+    def __init__(self, db):
+        super(table_staff,self).__init__(db,'staff')
+        self.fields = ['gsbm',##公司编号
+                        'id', 
+                        'bh',##编号
+                        'xm', ##姓名
+                        'xb',   ##性别
+                        'jssj',##进所时间
+                        'sfqht',##是否签合同
+                        'sfcjsb',##是否参加社保
+                        'sfdy'##是否党员
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_staff(self):
+        sql = 'select gsbm, web_staff from table_basic'
+        res =  self.exe_sql_w_return(sql)
+        sql = 'select gsbm, web_staff from table_subinfo'
+        res +=  self.exe_sql_w_return(sql)
+        return res
 
 #### start
 dtb = database('20190829')
