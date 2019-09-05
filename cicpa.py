@@ -156,7 +156,7 @@ class cicpa:
         		return "/cicpa2_web/public/query/subsws/1/"+offGuid+".html";
         	}"""
         
-        self.getSubOffice = """
+        self.getPerDetails = """
         	//注师详细信息
         	function getPerDetails(perGuid,perName){
         		perName = encodeURI(perName);

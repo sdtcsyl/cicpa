@@ -440,6 +440,10 @@ class table_partner(table):
     def func_select_partner(self):
         sql = 'select gsbm, web_partner from table_basic'
         return self.exe_sql_w_return(sql)
+    
+    def func_check_partner(self):
+        sql = 'select sum(substr(hhrrs, 0, instr(hhrrs,"（"))) from table_basic'
+        return sql
 
 '''///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
@@ -468,270 +472,274 @@ class table_staff(table):
     def func_select_staff(self):
         sql = 'select gsbm, web_staff from table_basic'
         res =  self.exe_sql_w_return(sql)
-        sql = 'select gsbm, web_staff from table_subinfo'
+        sql = 'select id, web_staff from table_subinfo'
         res +=  self.exe_sql_w_return(sql)
         return res
 
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+  
+class table_charity(table):
+    def __init__(self, db):
+        super(table_charity,self).__init__(db,'charity')
+        self.fields = ['gsbm',##公司编号
+                        'id', 
+                        'bh',##编号
+                        'gyhdmc', ##公益活动名称
+                        'hdzbdw',   ##活动主办单位
+                        'cjhdsj',##参加活动时间
+                        'cjhdfsjzynr'##参与活动方式及主要内容
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_charity(self):
+        sql = 'select gsbm, web_cygyhd from table_basic'
+        res =  self.exe_sql_w_return(sql)
+        return res
+
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+  
+class table_check(table):
+    def __init__(self, db):
+        super(table_check,self).__init__(db,'check')
+        self.fields = ['gsbm',##公司编号
+                        'id', 
+                        'bh',##编号
+                        'jcxh', ##检查协会
+                        'jsjcnd' ##接受检查年度
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_check(self):
+        sql = 'select gsbm, web_bjcxx from table_basic'
+        res =  self.exe_sql_w_return(sql)
+        return res    
+
+
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+  
+class table_overseas(table):
+    def __init__(self, db):
+        super(table_overseas,self).__init__(db,'overseas')
+        self.fields = ['gsbm',##公司编号
+                        'id', 
+                        'bh',##编号
+                        'jrsj', ##加入时间
+                        'gjkjgsmc', ##国际会计公司名称
+                        'zbzcd', ##总部注册地
+                        'dz', ##地址
+                        'dh', ##电话
+                        'cz', ##传真
+                        'fzr', ##负责人
+                        'dzyx', ##电子邮件
+                        'wz'  ##网址
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_overseas(self):
+        sql = 'select gsbm, web_jrgjwl from table_basic'
+        res =  self.exe_sql_w_return(sql)
+        return res
+    
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+  
+class table_overseasbranch(table):
+    def __init__(self, db):
+        super(table_overseasbranch,self).__init__(db,'overseasbranch')
+        self.fields = ['gsbm',##公司编号
+                        'id', 
+                        'bh',##编号
+                        'fzjgmc', ##分支机构名称
+                        'slsj', ##设立时间
+                        'szcs', ##所在城市
+                        'fzr', ##负责人
+                        'ygrs' ##员工人数
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_overseasbranch(self):
+        sql = 'select gsbm, web_jwfzjg from table_basic'
+        res =  self.exe_sql_w_return(sql)
+        return res    
+
+    
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+  
+class table_punishoff(table):
+    def __init__(self, db):
+        super(table_punishoff,self).__init__(db,'punishoff')
+        self.fields = ['gsbm',##公司编号
+                        'id', 
+                        'bh',##编号
+                        'swsmc', ##事务所名称
+                        'swsbh', ##事务所编号
+                        'cfcjsj', ##处罚/惩戒时间
+                        'sscfcjbm', ##实施处罚/惩戒的部门
+                        'cfcjjl', ##处罚/惩戒种类
+                        'cfcjcs', ##处罚/惩戒措施
+                        'cfcjwjh' ##处罚/惩戒文件号
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_punishoff(self):
+        sql = 'select gsbm, web_cfczxx from table_basic'
+        res =  self.exe_sql_w_return(sql)
+        return res    
+   
+
+    
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+  
+class table_regdisplay(table):
+    def __init__(self, db):
+        super(table_regdisplay,self).__init__(db,'regdisplay')
+        self.fields = ['gsbm',##公司编号
+                        'id', 
+                        'bh',##编号
+                        'zsxm', ##注师姓名
+                        'zsbh', ##注师编号
+                        'cfcjsj', ##处罚/惩戒时间
+                        'sscfcjbm', ##实施处罚/惩戒的部门
+                        'cfcjjl', ##处罚/惩戒种类
+                        'cfcjcs', ##处罚/惩戒措施
+                        'cfcjwjh', ##处罚/惩戒文件号
+                        'scfsszsws'##受处罚/惩戒时所在事务所
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_regdisplay(self):
+        sql = 'select gsbm, web_cfczxx from table_basic'
+        res =  self.exe_sql_w_return(sql)
+        return res   
+   
+
+    
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+  
+class table_cpainfo(table):
+    def __init__(self, db):
+        super(table_cpainfo,self).__init__(db,'cpainfo')
+        self.fields = ['gsbm',##公司编号
+                        'id', 
+                        'xm',##姓名
+                        'xb', ##性别
+                        'csny', ##出生年月
+                        'snzw', ##所内职务   
+                        'sfdy', ##是否党员
+                        'xl', ##学历
+                        'xw', ##学位
+                        'sxzy', ##所学专业
+                        'byxx', ##毕业学校
+                        'zgqdfs', ##资格取得方式（考试/考核）
+                        'qkhgzsh',##全科合格证书号
+                        'qkhgnf',##全科合格年份  
+                        'zckjszsbh',##注册会计师证书编号
+                        'sfgd', ##是否合伙人（股东）
+                        'pzzcwjh',##批准注册文件号
+                        'pzzcsj',##批准注册时间
+                        'szsws',##所在事务所
+                        'bndywcxs',##本年度应完成学时
+                        'ywcxs',##本年度已完成学时
+                        'web_cfcjxx',
+                        'cfcjxx',##处罚/惩戒信息
+                        'web_charity',
+                        'cjgyhd'##参加公益活动
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_cpainfo(self):
+        sql = 'select gsbm, web_xm from table_cpa'
+        res =  self.exe_sql_w_return(sql)
+        return res   
+
+    def func_update_overseascpa_from_cpainfo(self, data):
+        sql = 'select gsbm, zsmc, jwjg, ywmc, qdsj, zsbh, qdsd table_overseascpa where gsbm ='+ data[0]+ ' and zsmc =' + data[1] +' and jwzg=' + data[2]+ ' and ywmc='+ data[3] +' and qdsj=' + data[4] +' and zsbh='+data[5] +' and qdsd ='+ data[6]
+        res =  self.exe_sql_w_return(sql)
+        return res   
+    
+class table_cpainfo_overseas(table):
+    def __init__(self, db):
+        super(table_cpainfo_overseas,self).__init__(db,'cpainfo_overseas')
+        self.fields = ['gsbm', ##公司编号
+                       'id',
+                        'zsmc',     ##注师名称
+                        'bh',
+                        'jwzg',     ##境外资格中文名称
+                        
+                        'ywmc',     ##英文名称（简称）
+                        'qdsj',     ##取得时间
+                        'zsbh',     ##证书编号
+                        'qdsd'      ##取得地点
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_cpainfo(self):
+        sql = 'select gsbm, web_xm from table_cpa'
+        res =  self.exe_sql_w_return(sql)
+        return res   
+
+    
 #### start
 dtb = database('20190829')
 
 
-            
-def sqlwrite(data, table):    
-    conn = sqlite3.connect(Files.db_path + 'db.db')
-    cursor = conn.cursor()
-    cursor.execute(sql_create_table(table))
-    try:
 
-        if table == 'CPA':
-            cursor.execute('''insert into table_''' + 
-                           table + 
-                           '''( 
-                           gsbm,
-                           id,
-                           bh,
-                           xm,
-                           rybh,
-                           
-                           xb,
-                           csrq,
-                           qkhgzh
-                           ) 
-                           values (?,?,?,?,?,  ?,?,?)''', 
-                           (data))
-        if table == 'CPA_info':
-            cursor.execute('''insert into table_''' + 
-                           table + 
-                           '''( 
-                           gsbm,
-                           xm,
-                           xb,
-                           snzw,
-                           sfdy,
-                           
-                           sjyxx,                       
-                           xl,
-                           xw,
-                           sxzy,
-                           byxx,
-                           
-                           zgqdfs,
-                           qkhgsh,
-                           qkhgnf,
-                           zckjszsbh,
-                           sfhhr,
-                           
-                           pzzcwjh,                           
-                           pzzcsj,
-                           szsws,
-                           bndywcxs,
-                           cfcjxx, 
-                           
-                           bndywcxs,                           
-                           cjgyhd,                           
-                           jwzgzwmc,
-                           ywmc,
-                           qdsj,
-                           
-                           zsbh,                           
-                           qddd
-                           ) 
-                           values (?,?,?,?,?,  ?,?,?,?,?,  ?,?,?,?,?,  ?,?,?,?,?,  ?,?,?,?,?,  ?,?)''', 
-                           (data))
-        if table == 'overseas':
-            cursor.execute('''insert into table_''' + 
-                           table + 
-                           '''( 
-                           gsbm,
-                           jrsj,
-                           gjkjgsmc,
-                           zbzcd,
-                           dz,
-                           
-                           dh,                       
-                           cz,
-                           fzr,
-                           dzyj,
-                           wz
-                           ) 
-                           values (?,?,?,?,?,  ?,?,?,?,?)''', 
-                           (data))
-        if table == 'overseas branch':
-            cursor.execute('''insert into table_''' + 
-                           table + 
-                           '''( 
-                           gsbm,
-                           id,
-                           bh,
-                           fzjgmc,
-                           slsj,
-                           
-                           szcs,                       
-                           fzr,
-                           ygrs
-                           ) 
-                           values (?,?,?,?,?,  ?,?,?)''', 
-                           (data))
-        if table == 'charities':
-            cursor.execute('''insert into table_''' + 
-                           table + 
-                           '''( 
-                           gsbm,
-                           id,
-                           bh,
-                           gyhdgmc,
-                           hdzbdw,
-                           
-                           cjhdsj,                       
-                           cyhdfsjzyhd
-                           ) 
-                           values (?,?,?,?,?,  ?,?)''', 
-                           (data))
 
-        if table == 'check':
-            cursor.execute('''insert into table_''' + 
-                           table + 
-                           '''( 
-                           gsbm,
-                           id,
-                           bh,
-                           jcxh,
-                           jsjcnd
-                           ) 
-                           values (?,?,?,?,?)''', 
-                           (data))    
-        if table == 'staff':
-            cursor.execute('''insert into table_''' + 
-                           table + 
-                           '''( 
-                           gsbm,
-                           id,
-                           bh,
-                           xm,
-                           xb,
-                           
-                           jssj,                       
-                           sfqht,
-                           sfcjsb,
-                           sfdy
-                           ) 
-                           values (?,?,?,?,?,  ?,?,?,?)''', 
-                           (data))    
-        if table == 'partners':
-            cursor.execute('''insert into table_''' + 
-                           table + 
-                           '''( 
-                           gsbm,
-                           id,
-                           bh,
-                           hhr,
-                           zfzs,
-                           
-                           zsbg
-                           ) 
-                           values (?,?,?,?,?,  ?)''', 
-                           (data)) 
-    except sqlite3.IntegrityError:
-        pass
-    cursor.rowcount
-    cursor.close()
-    conn.commit()
-    conn.close()
 
-        
-def sqlselect(table, **args):    
-    conn = sqlite3.connect(Files.db_path + 'db.db')
-    cursor = conn.cursor()
-    cursor.execute('''create table if not exists table_''' + 
-                       table + 
-                       '''(
-                       id varchar(5),
-                       secCode varchar(5),
-                       secName varchar(5),
-                       orgId varchar(5),
-                       announcementId varchar(5),
-                       announcementTitle varchar(5),
-                       timestampStr varchar(5),
-                       adjunctUrl varchar(5)  primary key,
-                       adjunctSize varchar(5),
-                       adjunctType varchar(5),
-                       announcementType varchar(5),
-                       announcementTypeName varchar(5),
-                       associateAnnouncement varchar(5),
-                       batchNum varchar(5),
-                       columnId varchar(5),
-                       sid varchar(5),
-                       important varchar(5),
-                       orgName varchar(5),
-                       pageColumn varchar(5),
-                       storageTime varchar(5),
-                       page varchar(2),
-                       NY varchar(2)
-                       )''') 
-    
-    if 'alldata' in args:
-        cursor.execute('SELECT id  FROM table_' + table)  
-    else:   
-        cursor.execute('SELECT id, adjunctUrl, adjunctType FROM table_' + table + ' WHERE NY = 0') 
-    res =cursor.fetchall()
-    suc = res
-    cursor.close()
-    conn.commit()
-    conn.close() 
-    return suc
-    
-
-def sqlupdate(count, dl, table, record):    
-    conn = sqlite3.connect(Files.db_path + 'db.db')
-    cursor = conn.cursor()     
-    cursor.execute('UPDATE table_' + table + ' SET NY = ?  WHERE id = ?',(count, dl,)) 
-    cursor.close()
-    conn.commit()
-    conn.close() 
-
-def sqlcheck(table, **kws):
-    conn = sqlite3.connect(Files.db_path + 'db.db')
-    cursor = conn.cursor()
-    cursor.execute('''create table if not exists table_''' + 
-                           table + 
-                           '''(
-                           id varchar(5),
-                           secCode varchar(5),
-                           secName varchar(5),
-                           orgId varchar(5),
-                           announcementId varchar(5),
-                           announcementTitle varchar(5),
-                           timestampStr varchar(5),
-                           adjunctUrl varchar(5)  primary key,
-                           adjunctSize varchar(5),
-                           adjunctType varchar(5),
-                           announcementType varchar(5),
-                           announcementTypeName varchar(5),
-                           associateAnnouncement varchar(5),
-                           batchNum varchar(5),
-                           columnId varchar(5),
-                           sid varchar(5),
-                           important varchar(5),
-                           orgName varchar(5),
-                           pageColumn varchar(5),
-                           storageTime varchar(5),
-                           page varchar(2),
-                           NY varchar(2)
-                           )''') 
-    if 'filename' in kws:
-        cursor.execute('SELECT id FROM table_' + table + ' WHERE id = ?',(kws['filename'],))
-    if 'fileweb' in kws:
-        cursor.execute('SELECT adjunctUrl FROM table_' + table + ' WHERE adjunctUrl = ?',(kws['fileweb'],))
-    res =cursor.fetchall()
-    suc = 0
-    if len(res) > 0:
-        suc = 1
-    else:
-        suc = 0 
-    cursor.close()
-    conn.commit()
-    conn.close() 
-    return suc
 
 def sqloutput(table):
     conn = sqlite3.connect(Files.db_path + 'db.db')

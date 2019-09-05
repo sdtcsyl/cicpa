@@ -87,6 +87,7 @@ class cls_request:
                         return req
       
     def func_re_main_nums(self, data):
+        data = data.replace('&nbsp;','')
         dt = re.findall(r'<div id="leftctrl">([^<]*)</div>', data, re.S)
         dt = re.findall(r'([\d]+)', dt[0], re.S)
         return tuple(dt)
@@ -429,7 +430,7 @@ class request_partner(cls_request):
         return req
 
     def func_request_header(self, guid, code):
-        referer = self.baseurl + self.cxt.call("getPersons", guid, code)
+        referer = self.baseurl + self.cxt.call("getPartner", guid, code)
         self.header = {
         'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
         'Accept-Encoding': 'gzip, deflate',
@@ -454,12 +455,12 @@ class request_partner(cls_request):
         return data
         
                  
-    def func_re_cpa(self, data):
+    def func_re_partner(self, data):
         data = data.replace('\n','')
         data = data.replace('\t','')
         data = data.replace('\r','')
         data = data.replace(' ','')
-        dt = re.findall(r'<tr><tdalign="center">([^<]*)</td><tdalign="center"><ahref="#"onclick=([^>]*)>([^<]*)</a></td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td></tr>', data, re.S)
+        dt = re.findall(r'<tralign="center"><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
         return dt
     
 '''///////////////////////////////////////////////////////////////////
@@ -490,7 +491,7 @@ class request_staff(cls_request):
         return req
 
     def func_request_header(self, guid, code):
-        referer = self.baseurl + self.cxt.call("getPersons", guid, code)
+        referer = self.baseurl + self.cxt.call("getNwPers", guid, code)
         self.header = {
         'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
         'Accept-Encoding': 'gzip, deflate',
@@ -519,6 +520,487 @@ class request_staff(cls_request):
         data = data.replace('\t','')
         data = data.replace('\r','')
         data = data.replace(' ','')
-        dt = re.findall(r'<tr><tdalign="center">([^<]*)</td><tdalign="center"><ahref="#"onclick=([^>]*)>([^<]*)</a></td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td></tr>', data, re.S)
+        dt = re.findall(r'<tr><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td><tdalign="center">([^<]*)</td></tr>', data, re.S)
         return dt
     
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+
+class request_charity(cls_request):
+    def __init__(self):
+        super(request_charity, self).__init__()            
+        self.getGyhdInfo = """     
+        	//公益活动
+        	function getGyhdInfo(offGuid,title){
+        		title = encodeURI(title);
+        		var re = /%/g;
+        		title = title.replace(re,"-");
+        		return "/cicpa2_web/public/query/swsgyhd/"+title+"/"+offGuid+".html";
+        	}"""    
+        self.cxt = execjs.compile(self.getGyhdInfo)
+    
+        self.cookie = {
+        'cookiee':'20111116',
+        'JSESSIONID': '045A0265D94DCF9C258B99A431D6009D'
+        }   #please amend
+
+    def func_get(self, guid, code):
+        url = self.baseurl + self.cxt.call("getGyhdInfo", guid, code)
+        #print(url)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+    
+    def func_post(self, guid, code, page):
+        data = self.func_request_data(guid, code, page)
+        req = self.func_request_post(self.url, self.header, self.cookie, data, 'gb2312')
+        return req
+
+    def func_request_header(self, guid, code):
+        referer = self.baseurl + self.cxt.call("getGyhdInfo", guid, code)
+        self.header = {
+        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language' : 'en-US, en; q=0.8, zh-Hans-CN; q=0.7, zh-Hans; q=0.5, zh-Hant-HK; q=0.3, zh-Hant; q=0.2',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',       
+        'Content-Length' : '114',
+        'Content-Type' : 'application/x-www-form-urlencoded',
+        'Host': 'cmispub.cicpa.org.cn',
+        'Referer': referer,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
+        }   
+
+    def func_request_data(self, scope, name, pagenum):
+        data = {        
+           'offGuid' : scope,   
+           'method' : 'getGyhdList',   
+           'pageNum' : str(pagenum),
+           'pageSize' : None, 
+           'title': name
+                }
+        return data        
+                 
+    def func_re_charity(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','')
+        data = data.replace('\r','')
+        data = data.replace(' ','')
+        dt = re.findall(r'<tralign="center"><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><tdclass="data_tb_content">([^<]*)</td></tr>', data, re.S)
+        return dt
+
+    
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+
+class request_check(cls_request):
+    def __init__(self):
+        super(request_check, self).__init__()            
+        self.getChkedInfo = """
+        	//被检查信息
+        	function getChkedInfo(offGuid,title){
+        		title = encodeURI(title);
+        		var re = /%/g;
+        		title = title.replace(re,"-");
+        		return "/cicpa2_web/public/query/swsbjc/"+title+"/"+offGuid+".html";
+        	}"""   
+        self.cxt = execjs.compile(self.getChkedInfo)
+    
+        self.cookie = {
+        'cookiee':'20111116',
+        'JSESSIONID': '045A0265D94DCF9C258B99A431D6009D'
+        }   #please amend
+
+    def func_get(self, guid, code):
+        url = self.baseurl + self.cxt.call("getChkedInfo", guid, code)
+        #print(url)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+    
+    def func_post(self, guid, code, page):
+        data = self.func_request_data(guid, code, page)
+        req = self.func_request_post(self.url, self.header, self.cookie, data, 'gb2312')
+        return req
+
+    def func_request_header(self, guid, code):
+        referer = self.baseurl + self.cxt.call("getChkedInfo", guid, code)
+        self.header = {
+        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language' : 'en-US, en; q=0.8, zh-Hans-CN; q=0.7, zh-Hans; q=0.5, zh-Hant-HK; q=0.3, zh-Hant; q=0.2',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',       
+        'Content-Length' : '114',
+        'Content-Type' : 'application/x-www-form-urlencoded',
+        'Host': 'cmispub.cicpa.org.cn',
+        'Referer': referer,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
+        }   
+
+    def func_request_data(self, scope, name, pagenum):
+        data = {        
+           'offGuid' : scope,   
+           'method' : 'getChkedList',   
+           'pageNum' : str(pagenum),
+           'pageSize' : None, 
+           'title': name
+                }
+        return data        
+                 
+    def func_re_check(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','')
+        data = data.replace('\r','')
+        data = data.replace(' ','')
+        dt = re.findall(r'<tralign="center"><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        return dt
+
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+
+class request_overseas(cls_request):
+    def __init__(self):
+        super(request_overseas, self).__init__()            
+        self.getGjwlInfo = """
+            //国际网络
+        	function getGjwlInfo(offGuid,title){
+        		title = encodeURI(title);
+        		var re = /%/g;
+        		title = title.replace(re,"-");
+        		return "/cicpa2_web/public/query/swszywl/"+title+"/"+offGuid+".html";
+        	}"""
+        self.cxt = execjs.compile(self.getGjwlInfo)
+    
+        self.cookie = {
+        'cookiee':'20111116',
+        'JSESSIONID': '045A0265D94DCF9C258B99A431D6009D'
+        }   #please amend
+
+    def func_get(self, guid, code):
+        url = self.baseurl + self.cxt.call("getGjwlInfo", guid, code)
+        #print(url)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+    
+    def func_post(self, guid, code, page):
+        data = self.func_request_data(guid, code, page)
+        req = self.func_request_post(self.url, self.header, self.cookie, data, 'gb2312')
+        return req
+
+    def func_request_header(self, guid, code):
+        referer = self.baseurl + self.cxt.call("getGjwlInfo", guid, code)
+        self.header = {
+        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language' : 'en-US, en; q=0.8, zh-Hans-CN; q=0.7, zh-Hans; q=0.5, zh-Hant-HK; q=0.3, zh-Hant; q=0.2',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',       
+        'Content-Length' : '114',
+        'Content-Type' : 'application/x-www-form-urlencoded',
+        'Host': 'cmispub.cicpa.org.cn',
+        'Referer': referer,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
+        }   
+
+    def func_request_data(self, scope, name, pagenum):
+        data = {        
+           'offGuid' : scope,   
+           'method' : 'getGjwlList',   
+           'pageNum' : str(pagenum),
+           'pageSize' : None, 
+           'title': name
+                }
+        return data        
+                 
+    def func_re_overseas(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','')
+        data = data.replace('\r','')
+        data = data.replace('&nbsp;','')
+        data = data.replace(' ','')
+        dt = re.findall(r'<tralign="center"><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        return dt
+
+    def func_re_main_nums(self, data):
+        data = data.replace('&nbsp;','')
+        dt = re.findall(r'<div id="leftctrl">([^<]*)</div>', data, re.S)
+        dt = re.findall(r'([\d]+)', dt[0], re.S)
+        return tuple(dt)
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+
+class request_overseasbranch(cls_request):
+    def __init__(self):
+        super(request_overseasbranch, self).__init__()            
+        self.getJwjgInfo = """    
+        	//境外机构
+        	function getJwjgInfo(offGuid,title){
+        		title = encodeURI(title);
+        		var re = /%/g;
+        		title = title.replace(re,"-");
+        		return "/cicpa2_web/public/query/swsjwjg/"+title+"/"+offGuid+".html";
+        	}"""
+        self.cxt = execjs.compile(self.getJwjgInfo)
+    
+        self.cookie = {
+        'cookiee':'20111116',
+        'JSESSIONID': '045A0265D94DCF9C258B99A431D6009D'
+        }   #please amend
+
+    def func_get(self, guid, code):
+        url = self.baseurl + self.cxt.call("getJwjgInfo", guid, code)
+        #print(url)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+    
+    def func_post(self, guid, code, page):
+        data = self.func_request_data(guid, code, page)
+        req = self.func_request_post(self.url, self.header, self.cookie, data, 'gb2312')
+        return req
+
+    def func_request_header(self, guid, code):
+        referer = self.baseurl + self.cxt.call("getJwjgInfo", guid, code)
+        self.header = {
+        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language' : 'en-US, en; q=0.8, zh-Hans-CN; q=0.7, zh-Hans; q=0.5, zh-Hant-HK; q=0.3, zh-Hant; q=0.2',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',       
+        'Content-Length' : '114',
+        'Content-Type' : 'application/x-www-form-urlencoded',
+        'Host': 'cmispub.cicpa.org.cn',
+        'Referer': referer,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
+        }   
+
+    def func_request_data(self, scope, name, pagenum):
+        data = {        
+           'offGuid' : scope,   
+           'method' : 'getJwjgList',   
+           'pageNum' : str(pagenum),
+           'pageSize' : None, 
+           'title': name
+                }
+        return data        
+                 
+    def func_re_overseasbranch(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','')
+        data = data.replace('\r','')
+        data = data.replace('&nbsp;','')
+        data = data.replace(' ','')
+        dt = re.findall(r'<tralign="center"><td>([^<]*)</td><tdalign="center">([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        return dt
+
+    def func_re_main_nums(self, data):
+        data = data.replace('&nbsp;','')
+        dt = re.findall(r'<div id="leftctrl">([^<]*)</div>', data, re.S)
+        dt = re.findall(r'([\d]+)', dt[0], re.S)
+        return tuple(dt)
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+
+class request_punishoff(cls_request):
+    def __init__(self):
+        super(request_punishoff, self).__init__()            
+        self.getCjcfInfo = """     
+        	//惩戒处罚
+        	function getCjcfInfo(offGuid,title,code){
+        		title = encodeURI(title);
+        		//offGuid=offGuid+"_"+code;
+        		
+        		var re = /%/g;
+        		title = title.replace(re,"-");
+        		return "/cicpa2_web/public/query/swscjcf/"+title+"/"+offGuid+"/"+code+".html";
+        	}"""
+        self.cxt = execjs.compile(self.getCjcfInfo)
+    
+        self.cookie = {
+        'cookiee':'20111116',
+        'JSESSIONID': '045A0265D94DCF9C258B99A431D6009D'
+        }   #please amend
+
+    def func_get(self, guid):
+        url = 'http://cmispub.cicpa.org.cn/cicpa2_web/OfficeIndexAction.do?method=offPunish&isSubOffice=0&obj=' + guid 
+        #print(url)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+    
+    def func_post(self, guid, page):
+        data = self.func_request_data(guid, page)
+        req = self.func_request_post(self.url, self.header, self.cookie, data, 'gb2312')
+        return req
+
+    def func_request_header(self, guid):
+        referer = 'http://cmispub.cicpa.org.cn/cicpa2_web/OfficeIndexAction.do?method=offPunish&isSubOffice=0&obj=' + guid 
+        self.header = {
+        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language' : 'en-US, en; q=0.8, zh-Hans-CN; q=0.7, zh-Hans; q=0.5, zh-Hant-HK; q=0.3, zh-Hant; q=0.2',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',       
+        'Content-Length' : '114',
+        'Content-Type' : 'application/x-www-form-urlencoded',
+        'Host': 'cmispub.cicpa.org.cn',
+        'Referer': referer,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
+        }   
+
+    def func_request_data(self, scope, pagenum):
+        data = {        
+           'offGuid' : None,   
+           'method' : 'offPunish',   
+           'pageNum' : str(pagenum),
+           'pageSize' : 10, 
+           'obj' : scope,
+           'title': None
+                }
+        return data        
+                 
+    def func_re_punishoff(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','')
+        data = data.replace('\r','')
+        data = data.replace(' ','')
+        dt = re.findall(r'<tr[^>]*><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content"></td>--><td>([^<]*)</td><!--[^>]*--><td>([^<]*)</td><!--addend!--><td>([^<]*)</td></tr>', data, re.S)
+        return dt
+            
+    
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+
+class request_regdisplay(cls_request):
+    def __init__(self):
+        super(request_regdisplay, self).__init__()            
+        self.getCjcfInfo = """     
+        	//惩戒处罚
+        	function getCjcfInfo(offGuid,title,code){
+        		title = encodeURI(title);
+        		//offGuid=offGuid+"_"+code;
+        		
+        		var re = /%/g;
+        		title = title.replace(re,"-");
+        		return "/cicpa2_web/public/query/swscjcf/"+title+"/"+offGuid+"/"+code+".html";
+        	}"""
+        self.cxt = execjs.compile(self.getCjcfInfo)
+    
+        self.cookie = {
+        'cookiee':'20111116',
+        'JSESSIONID': '045A0265D94DCF9C258B99A431D6009D'
+        }   #please amend
+
+    def func_get(self, guid):
+        url = 'http://cmispub.cicpa.org.cn/cicpa2_web/OfficeIndexAction.do?method=regDisplay&isSubOffice=0&obj=' + guid 
+        #print(url)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+    
+    def func_post(self, guid, page):
+        data = self.func_request_data(guid, page)
+        req = self.func_request_post(self.url, self.header, self.cookie, data, 'gb2312')
+        return req
+
+    def func_request_header(self, guid):
+        referer = 'http://cmispub.cicpa.org.cn/cicpa2_web/OfficeIndexAction.do?method=regDisplay&isSubOffice=0&obj=' + guid 
+        self.header = {
+        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language' : 'en-US, en; q=0.8, zh-Hans-CN; q=0.7, zh-Hans; q=0.5, zh-Hant-HK; q=0.3, zh-Hant; q=0.2',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',       
+        'Content-Length' : '114',
+        'Content-Type' : 'application/x-www-form-urlencoded',
+        'Host': 'cmispub.cicpa.org.cn',
+        'Referer': referer,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
+        }   
+
+    def func_request_data(self, scope, pagenum):
+        data = {        
+           'offGuid' : None,   
+           'method' : 'regDisplay',   
+           'pageNum' : str(pagenum),
+           'pageSize' : 10, 
+           'obj' : scope,
+           'title': None
+                }
+        return data        
+                 
+    def func_re_regdisplay(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','')
+        data = data.replace('\r','')
+        data = data.replace(' ','')
+        dt = re.findall(r'<tralign[^>]*><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content"></td>--><td>([^<]*)</td><!--[^>]*><td>([^<]*)</td><!--addend!--><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        return dt
+    
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+    
+class request_cpainfo(cls_request):
+    def __init__(self):
+        super(request_cpainfo, self).__init__()
+        self.getPerDetails = """
+        	//注师详细信息
+        	function getPerDetails(perGuid,perName){
+        		perName = encodeURI(perName);
+        		var re = /%/g;
+        		perName = perName.replace(re,"-");
+        		url = "/cicpa2_web/public/query/sws/p/"+perGuid+".html";
+        		return url;
+        	}"""
+        self.cxt = execjs.compile(self.getPerDetails)
+    
+    def func_get(self, guid, code):
+        url = self.baseurl + self.cxt.call("getPerDetails", guid, code)
+        #print(url)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+    
+    def func_parse_cpa_basic(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','') 
+        data = data.replace('&nbsp;','')
+        data = data.replace(' ','')
+        #### 去掉 html head
+        data1 = re.sub('<scripttype="text/javascript">.*EXCEL"id=\'export\'/></td></tr></table>',r'',data,re.S) #去头
+        
+        ### 去掉 html tail
+        data2 = re.sub('<!--中部表格结束--><!--页面底部开始--></td></tr><TR><TDbackground=.*</script>',r'',data1,re.S)  #去尾
+        
+        dt = re.findall(r'<tdclass="data_tb_content"[^>]*>([^<]*)</td>', data2, re.S)
+        dt_a = re.findall(r'<tr><tdclass="tdl"[^>]*>处罚/惩戒信息</td><tdclass="data_tb_content"[^>]*>(<ahref="[^>]*>)?([^<]*)(</a>)?</td><tdclass="tdl"[^>]*>参加公益活动</td><tdclass="data_tb_content"[^>]*>(<ahref="[^>]*>)?([^<]*)(</a>)?</td>',data2, re.S)
+        if '领军人才年份' in dt:
+            dt = dt[0:12]+dt[14:21] + list(dt_a[0][0:2]+dt_a[0][3:5])
+        else:
+            dt = dt[0:19] + list(dt_a[0][0:2]+dt_a[0][3:5])
+        return tuple(dt), data2
+        
+    def func_parse_cpa_other(self, data):
+        dt = re.findall('<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        return tuple(dt)
