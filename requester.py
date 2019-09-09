@@ -994,7 +994,10 @@ class request_cpainfo(cls_request):
         data2 = re.sub('<!--中部表格结束--><!--页面底部开始--></td></tr><TR><TDbackground=.*</script>',r'',data1,re.S)  #去尾
         
         dt = re.findall(r'<tdclass="data_tb_content"[^>]*>([^<]*)</td>', data2, re.S)
+        data2 = re.sub('<tdclass="data_tb_content"[^>]*>([^<]*)</td>',r'',data2,re.S)
         dt_a = re.findall(r'<tr><tdclass="tdl"[^>]*>处罚/惩戒信息</td><tdclass="data_tb_content"[^>]*>(<ahref="[^>]*>)?([^<]*)(</a>)?</td><tdclass="tdl"[^>]*>参加公益活动</td><tdclass="data_tb_content"[^>]*>(<ahref="[^>]*>)?([^<]*)(</a>)?</td>',data2, re.S)
+        data2 = re.sub('<tr><tdclass="tdl"[^>]*>处罚/惩戒信息</td><tdclass="data_tb_content"[^>]*>(<ahref="[^>]*>)?([^<]*)(</a>)?</td><tdclass="tdl"[^>]*>参加公益活动</td><tdclass="data_tb_content"[^>]*>(<ahref="[^>]*>)?([^<]*)(</a>)?</td>',r'',data2,re.S)
+        
         if '领军人才年份' in dt:
             dt = dt[0:12]+dt[14:21] + list(dt_a[0][0:2]+dt_a[0][3:5])
         else:
@@ -1003,4 +1006,99 @@ class request_cpainfo(cls_request):
         
     def func_parse_cpa_other(self, data):
         dt = re.findall('<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
-        return tuple(dt)
+        data = re.sub('<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>',r'',data,re.S)
+        return tuple(dt), data
+
+#    def func_parse_cpa_cpa(self, data):
+#        data = re.sub(r'<tableid=\'lstable\'class="detail_table"cellspacing=\'0\'cellpadding=\'0\'width=\'100%\'align=\'center\'border=\'1\'><trclass="data_tb_td"align=\'center\'><tdbgcolor="#DCDCDC"width="5%">序号</td><tdbgcolor="#DCDCDC"width="30%">任职协会</td><tdbgcolor="#DCDCDC"width="20%">任职期间</td><tdbgcolor="#DCDCDC"width="15%">理事会届次</td><tdbgcolor="#DCDCDC"width="30%">具体职务（理事或常务理事）</td></tr>',r'',data,re.S)
+#        dt = re.findall(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+#        data = re.sub(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr></table></td></tr>',r'',data,re.S)
+#        return tuple(dt), data
+    
+    def func_parse_cpa_duty(self, data):
+        data = re.sub(r'<tableid=\'wytable\'class="detail_table"cellspacing=\'0\'cellpadding=\'0\'width=\'100%\'align=\'center\'border=\'1\'><trclass="data_tb_td"align=\'center\'><tdbgcolor="#DCDCDC"width="5%">序号</td><tdbgcolor="#DCDCDC"width="30%">任职协会</td><tdbgcolor="#DCDCDC"width="20%">任职期间</td><tdbgcolor="#DCDCDC"width="30%">专业委员会名称</td><tdbgcolor="#DCDCDC"width="15%">担任职务</td></tr>',r'',data,re.S)
+        dt = re.findall(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        data = re.sub(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>',r'',data,re.S)
+        return tuple(dt), data
+    
+    def func_parse_cpa_party(self, data):
+        data = re.sub(r'<tableid=\'mztable\'class="detail_table"cellspacing=\'0\'cellpadding=\'0\'width=\'100%\'align=\'center\'border=\'1\'><trclass="data_tb_td"align=\'center\'><tdbgcolor="#DCDCDC"width="5%">序号</td><tdbgcolor="#DCDCDC"width="35%">任职民主党派/工商联</td><tdbgcolor="#DCDCDC"width="20%">任职期间</td><tdbgcolor="#DCDCDC"width="25%">加入时间</td><tdbgcolor="#DCDCDC"width="15%">担任职务</td></tr>',r'',data,re.S)
+        dt = re.findall(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        data = re.sub(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td></tr>',r'',data,re.S)
+        return tuple(dt), data   
+    
+    
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+
+class request_cpainfo_penalty(cls_request):
+    def __init__(self):
+        super(request_cpainfo_penalty, self).__init__()            
+        self.getCjcfInfo = """     
+        	//惩戒处罚
+        	function getCjcfInfo(offGuid,title){
+        		title = encodeURI(title+"（处罚/惩戒信息）");
+        		//offGuid=offGuid+"_"+code;
+        		
+        		var re = /%/g;
+        		title = title.replace(re,"-");
+        		return "/cicpa2_web/public/query/zscjcf/"+title+"/"+offGuid+".html";
+        	}"""
+        self.cxt = execjs.compile(self.getCjcfInfo)
+    
+        self.cookie = {
+        'cookiee':'20111116',
+        'JSESSIONID': '045A0265D94DCF9C258B99A431D6009D'
+        }   #please amend
+
+    def func_get(self, guid, code):
+        url = self.baseurl + self.cxt.call("getCjcfInfo", guid, code)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+    
+                 
+    def func_re(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','')
+        data = data.replace('\r','')
+        data = data.replace(' ','')
+        dt = re.findall(r'<tralign="center"><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content"></td>--><td>([^<]*)</td><!--[^>]*><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        return dt
+    
+    
+    
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+
+class request_cpainfo_charity(cls_request):
+    def __init__(self):
+        super(request_cpainfo_charity, self).__init__()            
+        self.getGyhdInfo = """     
+        	//公益活动
+        	function getGyhdInfo(offGuid,title){
+        		title = encodeURI(title+"（参与公益活动）");
+        		var re = /%/g;
+        		title = title.replace(re,"-");
+        		return "/cicpa2_web/public/query/zsgyhd/"+title+"/"+offGuid+".html";
+        	}"""    
+        self.cxt = execjs.compile(self.getGyhdInfo)
+
+    def func_get(self, guid, code):
+        url = self.baseurl + self.cxt.call("getGyhdInfo", guid, code)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+                  
+    def func_re(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','')
+        data = data.replace('\r','')
+        data = data.replace(' ','')
+        dt = re.findall(r'<tralign="center"><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)<td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        return dt
+    

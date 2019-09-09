@@ -732,6 +732,126 @@ class table_cpainfo_overseas(table):
         res =  self.exe_sql_w_return(sql)
         return res   
 
+
+#class table_cpainfo_cpa(table):
+#    def __init__(self, db):
+#        super(table_cpainfo_cpa,self).__init__(db,'cpainfo_cpa')
+#        self.fields = ['gsbm', ##公司编号
+#                       'id',
+#                        'zsmc',     ##注师名称
+#                        'bh',
+#                        'rzxh',     ##任职协会
+#                        
+#                        'rzqj',     ##任职期间
+#                        'lshjc',     ##理事会届次
+#                        'jtzw'     ##具体职务（理事或常务理事）
+#                        ]   ##
+#        self.types = ['varchar(2)']*len(self.fields)
+#        self.primary_key = ['id']
+#        #self.add_foreign_key('gsbm','main','swsbm')
+#        self.exe_sql(self.sql_create_table())
+#
+#    def func_select_cpainfo(self):
+#        sql = 'select gsbm, web_xm from table_cpa'
+#        res =  self.exe_sql_w_return(sql)
+#        return res   
+
+class table_cpainfo_duty(table):
+    def __init__(self, db):
+        super(table_cpainfo_duty,self).__init__(db,'cpainfo_duty')
+        self.fields = ['gsbm', ##公司编号
+                       'id',
+                        'zsmc',     ##注师名称
+                        'bh',
+                        'rzxh',     ##任职协会
+                        
+                        'rzqj',     ##任职期间
+                        'zywyhmc',     ##专业委员会名称
+                        'drzw'     ##担任职务
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_cpainfo(self):
+        sql = 'select gsbm, web_xm from table_cpa'
+        res =  self.exe_sql_w_return(sql)
+        return res   
+    
+class table_cpainfo_party(table):
+    def __init__(self, db):
+        super(table_cpainfo_party,self).__init__(db,'cpainfo_party')
+        self.fields = ['gsbm', ##公司编号
+                       'id',
+                        'zsmc',     ##注师名称
+                        'bh',
+                        'rzmzdpgsl',     ##任职民主党派/工商联
+                        
+                        'rzqj',     ##任职期间
+                        'jrsj',     ##加入时间
+                        'drzw'     ##担任职务
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_cpainfo(self):
+        sql = 'select gsbm, web_xm from table_cpa'
+        res =  self.exe_sql_w_return(sql)
+        return res   
+
+class table_cpainfo_penalty(table):
+    def __init__(self, db):
+        super(table_cpainfo_penalty,self).__init__(db,'cpainfo_penalty')
+        self.fields = ['gsbm', ##公司编号                       
+                        'zsxm', ##注师姓名
+                        'zsbh', ##注师编号
+                        'id',
+                        'bh', ##编号
+                        'cfcjsj', ##处罚/惩戒时间
+                        'sscfcjbm', ##实施处罚/惩戒的部门
+                        'cfcjjl', ##处罚/惩戒种类
+                        'cfcjcs', ##处罚/惩戒措施
+                        'cfcjwjh' ##处罚/惩戒文件号
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_cpainfo(self):
+        sql = 'select gsbm, xm, zckjszsbh, web_cfcjxx from table_cpainfo where web_cfcjxx != ""'
+        res =  self.exe_sql_w_return(sql)
+        return res  
+
+class table_cpainfo_charity(table):
+    def __init__(self, db):
+        super(table_cpainfo_charity,self).__init__(db,'cpainfo_charity')
+        self.fields = ['gsbm', ##公司编号
+                       'zsxm', ##注师姓名
+                        'zsbh', ##注师编号
+                        'id',
+                        'bh',   ##序号
+                        'gyhdmc',     ##公益活动名称
+                        
+                        'hdzbdw',     ##活动主办单位
+                        'cjhdsj',     ##参加活动时间
+                        'cyhdfsjzynr' ##参与活动方式及主要内容
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    def func_select_cpainfo(self):
+        sql = 'select gsbm, xm, zckjszsbh, web_charity from table_cpainfo where web_charity != ""'
+        res =  self.exe_sql_w_return(sql)
+        return res
+    
+    
+    
     
 #### start
 dtb = database('20190829')
