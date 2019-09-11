@@ -382,6 +382,16 @@ class table_subinfo(table):
         #self.add_foreign_key('gsbm','main','swsbm')
         self.exe_sql(self.sql_create_table())
 
+    def func_check_subsidiaries_diff(self):
+        ## check subisidiaries number with table_subsidiaries.
+        sql = 'select count(*) from table_subsidiaries;'
+        res = self.exe_sql_w_return(sql)
+        sql = 'select count(*) from table_subinfo;'
+        res2 = self.exe_sql_w_return(sql)
+        return res2[0]-res[0]
+        
+
+
 '''///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
@@ -415,6 +425,18 @@ class table_cpa(table):
         sql = 'select id, web_cpa from table_subinfo'
         return self.exe_sql_w_return(sql)
 
+    def func_check_cpa_diff(self):
+        sql = 'select a.gsbm, a.hhrrs, b.hhrrs from (select gsbm, substr(kjsrs, 0, instr(kjsrs,"（")) as hhrrs from table_basic) a left join (select distinct gsbm, count(*) hhrrs from table_cpa group by gsbm) b on a.gsbm = b.gsbm where cast(a.hhrrs as integer) != cast(b.hhrrs as integer);'
+        res = self.exe_sql_w_return(sql)
+        sql = 'select gsbm, substr(kjsrs, 0, instr(kjsrs,"（")), 0 from table_basic where gsbm not in (select distinct gsbm from table_staff) and cast(cyryrs as integer) >0;'
+        res += self.exe_sql_w_return(sql)
+        sql = 'select a.gsbm, a.hhrrs, b.hhrrs from (select id gsbm, substr(zckjszs, 0, instr(zckjszs,"（")) as hhrrs from table_subinfo) a left join (select distinct gsbm, count(*) hhrrs from table_cpa group by gsbm) b on a.gsbm = b.gsbm where cast(a.hhrrs as integer) != cast(b.hhrrs as integer);'
+        res = self.exe_sql_w_return(sql)
+        sql = 'select id, substr(zckjszs, 0, instr(zckjszs,"（")), 0 from table_subinfo where id not in (select distinct gsbm from table_cpa) and cast(zckjszs as integer) >0;'
+        res += self.exe_sql_w_return(sql)
+        return res
+
+
 '''///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
@@ -441,10 +463,13 @@ class table_partner(table):
         sql = 'select gsbm, web_partner from table_basic'
         return self.exe_sql_w_return(sql)
     
-    def func_check_partner(self):
-        sql = 'select sum(substr(hhrrs, 0, instr(hhrrs,"（"))) from table_basic'
-        return sql
-
+    def func_check_partner_diff_w_basic(self):
+        sql = 'select a.gsbm, a.hhrrs, b.hhrrs from (select gsbm, substr(hhrrs, 0, instr(hhrrs,"（")) as hhrrs from table_basic) a left join (select distinct gsbm, count(*) hhrrs from table_partner group by gsbm) b on a.gsbm = b.gsbm where cast(a.hhrrs as integer) <> cast(b.hhrrs as integer);'
+        res = self.exe_sql_w_return(sql)
+        sql = 'select gsbm, substr(hhrrs, 0, instr(hhrrs,"（")), 0 from table_basic where gsbm not in (select distinct gsbm from table_partner) and cast(substr(hhrrs, 0, instr(hhrrs,"（")) as integer) >0;'
+        res += self.exe_sql_w_return(sql)
+        return res
+        
 '''///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
@@ -476,6 +501,16 @@ class table_staff(table):
         res +=  self.exe_sql_w_return(sql)
         return res
 
+    def func_check_staff_diff(self):
+        sql = 'select a.gsbm, a.hhrrs, b.hhrrs from (select gsbm, substr(cyryrs, 0, instr(cyryrs,"（")) as hhrrs from table_basic) a left join (select distinct gsbm, count(*) hhrrs from table_staff group by gsbm) b on a.gsbm = b.gsbm where cast(a.hhrrs as integer) != cast(b.hhrrs as integer);'
+        res = self.exe_sql_w_return(sql)
+        sql = 'select gsbm, substr(cyryrs, 0, instr(cyryrs,"（")), 0 from table_basic where gsbm not in (select distinct gsbm from table_staff) and cast(cyryrs as integer) >0;'
+        res += self.exe_sql_w_return(sql)
+        sql = 'select a.gsbm, a.hhrrs, b.hhrrs from (select id gsbm, substr(cyryzs, 0, instr(cyryrs,"（")) as hhrrs from table_subinfo) a left join (select distinct gsbm, count(*) hhrrs from table_staff group by gsbm) b on a.gsbm = b.gsbm where cast(a.hhrrs as integer) != cast(b.hhrrs as integer);'
+        res = self.exe_sql_w_return(sql)
+        sql = 'select id, substr(cyryzs, 0, instr(cyryzs,"（")), 0 from table_subinfo where id not in (select distinct gsbm from table_staff) and cast(cyryzs as integer) >0;'
+        res += self.exe_sql_w_return(sql)
+        return res
 
 '''///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
@@ -601,7 +636,7 @@ class table_overseasbranch(table):
   
 class table_punishoff(table):
     def __init__(self, db):
-        super(table_punishoff,self).__init__(db,'punishoff')
+        super(table_punishoff,self).__init__(db,'punishoffs')
         self.fields = ['gsbm',##公司编号
                         'id', 
                         'bh',##编号
@@ -609,6 +644,7 @@ class table_punishoff(table):
                         'swsbh', ##事务所编号
                         'cfcjsj', ##处罚/惩戒时间
                         'sscfcjbm', ##实施处罚/惩戒的部门
+                        'yy', ##原因
                         'cfcjjl', ##处罚/惩戒种类
                         'cfcjcs', ##处罚/惩戒措施
                         'cfcjwjh' ##处罚/惩戒文件号
@@ -619,11 +655,28 @@ class table_punishoff(table):
         self.exe_sql(self.sql_create_table())
 
     def func_select_punishoff(self):
-        sql = 'select gsbm, web_cfczxx from table_basic'
+        sql = 'select gsbm, web_cfczxx from table_basic where web_cfczxx <> ""'
         res =  self.exe_sql_w_return(sql)
         return res    
    
+    def func_select_punishoff_f_subinfo(self):
+        sql = 'select id, web_cfcjxx from table_subinfo where web_cfcjxx <> ""'
+        res =  self.exe_sql_w_return(sql)
+        return res  
+    
+    ### We check the punishoff table with subinfo and basic tables where punished link is not null
+    ### there are lots of office have no punish information
+    def func_check_punishoff(self):
+        sql = 'select id, web_cfcjxx  from table_subinfo where id not in (select distinct gsbm from table_punishoffs) and web_cfcjxx <>"" union select gsbm, web_cfczxx  from table_basic where gsbm not in (select distinct gsbm from table_punishoffs) and web_cfczxx <>"";'
+        res =  self.exe_sql_w_return(sql)
+        return res  
 
+    def func_check_w_basic(self):
+        sql = 'select gsbm, web_cfczxx from table_basic where gsbm not in (select gsbm from table_regdisplays) and gsbm not in (select gsbm from table_punishoffs) and web_cfczxx <>"";'
+        res =  self.exe_sql_w_return(sql)
+        return res  
+    
+    
     
 '''///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
@@ -633,7 +686,7 @@ class table_punishoff(table):
   
 class table_regdisplay(table):
     def __init__(self, db):
-        super(table_regdisplay,self).__init__(db,'regdisplay')
+        super(table_regdisplay,self).__init__(db,'regdisplays')
         self.fields = ['gsbm',##公司编号
                         'id', 
                         'bh',##编号
@@ -641,6 +694,7 @@ class table_regdisplay(table):
                         'zsbh', ##注师编号
                         'cfcjsj', ##处罚/惩戒时间
                         'sscfcjbm', ##实施处罚/惩戒的部门
+                        'yy', ##原因
                         'cfcjjl', ##处罚/惩戒种类
                         'cfcjcs', ##处罚/惩戒措施
                         'cfcjwjh', ##处罚/惩戒文件号
@@ -652,12 +706,23 @@ class table_regdisplay(table):
         self.exe_sql(self.sql_create_table())
 
     def func_select_regdisplay(self):
-        sql = 'select gsbm, web_cfczxx from table_basic'
+        sql = 'select gsbm, web_cfczxx from table_basic where web_cfczxx <> ""'
         res =  self.exe_sql_w_return(sql)
         return res   
    
-
+    def func_select_regdisplay_f_subinfo(self):
+        sql = 'select id, web_cfcjxx from table_subinfo where web_cfcjxx <> ""'
+        res =  self.exe_sql_w_return(sql)
+        return res  
     
+    
+    ### We check the regdisplay table with subinfo and basic tables where punished link is not null
+    ### there are lots of personal have no punish information
+    def func_check_regdisplay(self):
+        sql = 'select id, web_cfcjxx from table_subinfo where id not in (select distinct gsbm from table_regdisplays) and web_cfcjxx <>"" union select gsbm, web_cfczxx from table_basic where gsbm not in (select distinct gsbm from table_regdisplays) and web_cfczxx <>"";'
+        res =  self.exe_sql_w_return(sql)
+        return res      
+        
 '''///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
@@ -712,6 +777,7 @@ class table_cpainfo_overseas(table):
     def __init__(self, db):
         super(table_cpainfo_overseas,self).__init__(db,'cpainfo_overseas')
         self.fields = ['gsbm', ##公司编号
+                       'cpano',##注册会计师证书编号
                        'id',
                         'zsmc',     ##注师名称
                         'bh',
@@ -760,6 +826,7 @@ class table_cpainfo_duty(table):
     def __init__(self, db):
         super(table_cpainfo_duty,self).__init__(db,'cpainfo_duty')
         self.fields = ['gsbm', ##公司编号
+                       'cpano',##注册会计师证书编号
                        'id',
                         'zsmc',     ##注师名称
                         'bh',
@@ -783,6 +850,7 @@ class table_cpainfo_party(table):
     def __init__(self, db):
         super(table_cpainfo_party,self).__init__(db,'cpainfo_party')
         self.fields = ['gsbm', ##公司编号
+                       'cpano',##注册会计师证书编号
                        'id',
                         'zsmc',     ##注师名称
                         'bh',
@@ -802,9 +870,14 @@ class table_cpainfo_party(table):
         res =  self.exe_sql_w_return(sql)
         return res   
 
+
+
+
+
+### penalty table is derived from the cpainfo table because cpainfo table will provide the web link.
 class table_cpainfo_penalty(table):
     def __init__(self, db):
-        super(table_cpainfo_penalty,self).__init__(db,'cpainfo_penalty')
+        super(table_cpainfo_penalty,self).__init__(db,'cpainfo_penalties')
         self.fields = ['gsbm', ##公司编号                       
                         'zsxm', ##注师姓名
                         'zsbh', ##注师编号
@@ -812,6 +885,7 @@ class table_cpainfo_penalty(table):
                         'bh', ##编号
                         'cfcjsj', ##处罚/惩戒时间
                         'sscfcjbm', ##实施处罚/惩戒的部门
+                        'web_cfcjgg', ##
                         'cfcjjl', ##处罚/惩戒种类
                         'cfcjcs', ##处罚/惩戒措施
                         'cfcjwjh' ##处罚/惩戒文件号
@@ -826,6 +900,21 @@ class table_cpainfo_penalty(table):
         res =  self.exe_sql_w_return(sql)
         return res  
 
+    ### penalties table has two checks
+    ### first, we have to check with the cpainfo which has web link to penalty
+    def func_check_penalty_diff_w_cpainfo(self):
+        sql ='select zckjszsbh, xm, web_cfcjxx from table_cpainfo where web_cfcjxx <>"" and zckjszsbh not in (select zsbh from table_cpainfo_penalties);'
+        res =  self.exe_sql_w_return(sql)
+        return res 
+    
+    ### second, we have to check with the regdisplay table, which is the personal penalty disclosure. but some people may retire or out of the market.
+    def func_check_penalty_diff_w_regdisplay(self):
+        sql = 'select distinct zsbh from table_regdisplays where zsbh not in (select zsbh from table_cpainfo_penalties);'
+        res =  self.exe_sql_w_return(sql)
+        return res          
+    
+
+### charity table is derived from the cpainfo table because cpainfo table will provide the web link.    
 class table_cpainfo_charity(table):
     def __init__(self, db):
         super(table_cpainfo_charity,self).__init__(db,'cpainfo_charity')
@@ -849,25 +938,10 @@ class table_cpainfo_charity(table):
         sql = 'select gsbm, xm, zckjszsbh, web_charity from table_cpainfo where web_charity != ""'
         res =  self.exe_sql_w_return(sql)
         return res
-    
-    
-    
-    
-#### start
-dtb = database('20190829')
 
-
-
-
-
-
-def sqloutput(table):
-    conn = sqlite3.connect(Files.db_path + 'db.db')
-    cursor = conn.cursor()
-    cursor.execute('select swsbm, web, swsmc, txdz, lxr, lxdh, page, NY from table_'+table)
-    res =cursor.fetchall()
-    cursor.close()
-    conn.commit()
-    conn.close()
-    return res
-    
+    ### penalties table has one check
+    ### first, we have to check with the cpainfo which has web link to charity
+    def func_check_charity_diff_w_cpainfo(self):
+        sql ='select zckjszsbh, xm, web_charity from table_cpainfo where web_charity <>"" and zckjszsbh not in (select zsbh from table_cpainfo_charity);'
+        res =  self.exe_sql_w_return(sql)
+        return res

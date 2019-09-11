@@ -7,7 +7,7 @@ import time
 import requests
 import re
 import execjs
-from lxml import etree
+import math
 import subprocess
 
 
@@ -879,7 +879,7 @@ class request_punishoff(cls_request):
         data = data.replace('\t','')
         data = data.replace('\r','')
         data = data.replace(' ','')
-        dt = re.findall(r'<tr[^>]*><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content"></td>--><td>([^<]*)</td><!--[^>]*--><td>([^<]*)</td><!--addend!--><td>([^<]*)</td></tr>', data, re.S)
+        dt = re.findall(r'<tr[^>]*><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content">([^<]*)</td>--><td>([^<]*)</td><!--[^>]*--><td>([^<]*)</td><!--addend!--><td>([^<]*)</td></tr>', data, re.S)
         return dt
             
     
@@ -951,10 +951,161 @@ class request_regdisplay(cls_request):
         data = data.replace('\n','')
         data = data.replace('\t','')
         data = data.replace('\r','')
+        data = data.replace('&nbsp;','')
         data = data.replace(' ','')
-        dt = re.findall(r'<tralign[^>]*><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content"></td>--><td>([^<]*)</td><!--[^>]*><td>([^<]*)</td><!--addend!--><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        data = data.replace('<br>','')
+        data = data.replace('</br>','')
+        
+        dt = re.findall(r'<tr[^>]*><td>([^<]*)</td>(<td>[^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content">([^<]*)</td>--><td>([^<]*)</td><!--[^>]*><td>([^<]*)</td><!--addend!--><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        if len(dt) ==0:
+            dt = re.findall(r'<tr[^>]*><td[^>]*>([^<]*)</td><td[^>]*>([^<]*)</td></tr>',data,re.S)
+            for i in range(0, len(dt),1):
+                dt[i] = dt[i] + (' ',) * (10 - len(dt[i]))
         return dt
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+
+class request_punishoff_subinfo(cls_request):
+    def __init__(self):
+        super(request_punishoff_subinfo, self).__init__()            
+        self.getCjcfInfo = """     
+        	//惩戒处罚
+        	function getCjcfInfo(offGuid,title,code){
+        		title = encodeURI(title);
+        		//offGuid=offGuid+"_"+code;
+        		
+        		var re = /%/g;
+        		title = title.replace(re,"-");
+        		return "/cicpa2_web/public/query/swscjcf/"+title+"/"+offGuid+"/"+code+".html";
+        	}"""
+        self.cxt = execjs.compile(self.getCjcfInfo)
     
+        self.cookie = {
+        'cookiee':'20111116',
+        'JSESSIONID': '045A0265D94DCF9C258B99A431D6009D'
+        }   #please amend
+
+    def func_get(self, guid):
+        url = 'http://cmispub.cicpa.org.cn/cicpa2_web/OfficeIndexAction.do?method=offPunish&isSubOffice=1&obj=' + guid 
+        #print(url)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+    
+    def func_post(self, guid, page):
+        data = self.func_request_data(guid, page)
+        req = self.func_request_post(self.url, self.header, self.cookie, data, 'gb2312')
+        return req
+
+    def func_request_header(self, guid):
+        referer = 'http://cmispub.cicpa.org.cn/cicpa2_web/OfficeIndexAction.do?method=offPunish&isSubOffice=0&obj=' + guid 
+        self.header = {
+        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language' : 'en-US, en; q=0.8, zh-Hans-CN; q=0.7, zh-Hans; q=0.5, zh-Hant-HK; q=0.3, zh-Hant; q=0.2',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',       
+        'Content-Length' : '114',
+        'Content-Type' : 'application/x-www-form-urlencoded',
+        'Host': 'cmispub.cicpa.org.cn',
+        'Referer': referer,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
+        }   
+
+    def func_request_data(self, scope, pagenum):
+        data = {        
+           'offGuid' : None,   
+           'method' : 'offPunish',   
+           'pageNum' : str(pagenum),
+           'pageSize' : 10, 
+           'obj' : scope,
+           'title': None
+                }
+        return data        
+                 
+    def func_re_punishoff(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','')
+        data = data.replace('\r','')
+        data = data.replace(' ','')
+        dt = re.findall(r'<tr[^>]*><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content">([^<]*)</td>--><td>([^<]*)</td><!--[^>]*--><td>([^<]*)</td><!--addend!--><td>([^<]*)</td></tr>', data, re.S)
+        return dt
+            
+    
+
+'''///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////'''
+   
+
+class request_regdisplay_subinfo(cls_request):
+    def __init__(self):
+        super(request_regdisplay_subinfo, self).__init__()            
+        self.getCjcfInfo = """     
+        	//惩戒处罚
+        	function getCjcfInfo(offGuid,title,code){
+        		title = encodeURI(title);
+        		//offGuid=offGuid+"_"+code;
+        		
+        		var re = /%/g;
+        		title = title.replace(re,"-");
+        		return "/cicpa2_web/public/query/swscjcf/"+title+"/"+offGuid+"/"+code+".html";
+        	}"""
+        self.cxt = execjs.compile(self.getCjcfInfo)
+    
+        self.cookie = {
+        'cookiee':'20111116',
+        'JSESSIONID': '045A0265D94DCF9C258B99A431D6009D'
+        }   #please amend
+
+    def func_get(self, guid):
+        url = 'http://cmispub.cicpa.org.cn/cicpa2_web/OfficeIndexAction.do?method=regDisplay&isSubOffice=1&obj=' + guid 
+        #print(url)
+        req = self.func_request_get(url, 'gb2312')
+        return req
+    
+    def func_post(self, guid, page):
+        data = self.func_request_data(guid, page)
+        req = self.func_request_post(self.url, self.header, self.cookie, data, 'gb2312')
+        return req
+
+    def func_request_header(self, guid):
+        referer = 'http://cmispub.cicpa.org.cn/cicpa2_web/OfficeIndexAction.do?method=regDisplay&isSubOffice=0&obj=' + guid 
+        self.header = {
+        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language' : 'en-US, en; q=0.8, zh-Hans-CN; q=0.7, zh-Hans; q=0.5, zh-Hant-HK; q=0.3, zh-Hant; q=0.2',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',       
+        'Content-Length' : '114',
+        'Content-Type' : 'application/x-www-form-urlencoded',
+        'Host': 'cmispub.cicpa.org.cn',
+        'Referer': referer,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
+        }   
+
+    def func_request_data(self, scope, pagenum):
+        data = {        
+           'offGuid' : None,   
+           'method' : 'regDisplay',   
+           'pageNum' : str(pagenum),
+           'pageSize' : 10, 
+           'obj' : scope,
+           'title': None
+                }
+        return data        
+                 
+    def func_re_regdisplay(self, data):
+        data = data.replace('\n','')
+        data = data.replace('\t','')
+        data = data.replace('\r','')
+        data = data.replace(' ','')
+        dt = re.findall(r'<tralign[^>]*><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content">([^<]*)</td>--><td>([^<]*)</td><!--[^>]*><td>([^<]*)</td><!--addend!--><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        return dt
 
 '''///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////
@@ -1064,8 +1215,9 @@ class request_cpainfo_penalty(cls_request):
         data = data.replace('\n','')
         data = data.replace('\t','')
         data = data.replace('\r','')
-        data = data.replace(' ','')
-        dt = re.findall(r'<tralign="center"><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content"></td>--><td>([^<]*)</td><!--[^>]*><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+        data = data.replace('&nbsp;','')
+        data = data.replace(' ','')    
+        dt = re.findall(r'<tralign="center"><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><!--[^<]*<tdclass="data_tb_content">([^<]*)</td>--><td>([^<]*)</td><!--[^>]*><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
         return dt
     
     

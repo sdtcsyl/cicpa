@@ -16,7 +16,7 @@ def main_table_cpainfo(date):
     db_cpainfo_party = db.table_cpainfo_party(date)
     
     selections = db_cpainfo.func_select_cpainfo() 
-    for s in range(0,len(selections),1):
+    for s in range(90000,len(selections),1):
         selection = selections[s]
         guid = selection[1].split("'")[1]
         code = selection[1].split("'")[3]
@@ -28,17 +28,17 @@ def main_table_cpainfo(date):
         
         infos, data = rq_cpainfo.func_parse_cpa_other(data)
         for info in infos:
-            db_cpainfo_overseas.func_write_table((selection[0],selection[0]+'_'+code+'_'+info[0],code,)+info)
+            db_cpainfo_overseas.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
         db_main.func_update(selection[0],'no_subinfo',len(infos))
 
         infos, data = rq_cpainfo.func_parse_cpa_duty(data)
         for info in infos:
-            db_cpainfo_duty.func_write_table((selection[0],selection[0]+'_'+code+'_'+info[0],code,)+info)
+            db_cpainfo_duty.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
         db_main.func_update(selection[0],'pages_subinfo',len(infos))
 
         infos, data = rq_cpainfo.func_parse_cpa_party(data)
         for info in infos:
-            db_cpainfo_party.func_write_table((selection[0],selection[0]+'_'+code+'_'+info[0],code,)+info)
+            db_cpainfo_party.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
         db_main.func_update(selection[0],'subinfo_NY',len(infos))        
         if len(data)  > 2200:
             with open(fl.html_path  + code +".txt", "w", encoding='utf-8') as text_file:
@@ -60,6 +60,19 @@ def main_table_cpainfo_penalty(date):
         req_dt = rq_cpainfo_penalty.func_re(data)
         for dt in req_dt:
             db_cpainfo_penalty.func_write_table((selection[0], selection[1], selection[2],  selection[2]+ '_' + dt[0],) + dt)
+    
+    selections = db_cpainfo_penalty.func_check_penalty_diff_w_cpainfo() 
+    for s in range(0,len(selections),1):
+        selection = selections[s]
+        guid = selection[2].split("'")[1]
+        code = selection[2].split("'")[3]
+        req = rq_cpainfo_penalty.func_get(guid, code)
+        data = req.text
+        
+        req_dt = rq_cpainfo_penalty.func_re(data)
+        for dt in req_dt:
+            db_cpainfo_penalty.func_write_table((selection[0], selection[1], selection[2],  selection[2]+ '_' + dt[0],) + dt)
+    
 
 
 def main_table_cpainfo_charity(date):
@@ -80,4 +93,4 @@ def main_table_cpainfo_charity(date):
        
 if __name__ =='__main__' :
     date = '20190829'
-    main_table_cpainfo(date)
+    #main_table_cpainfo(date)
