@@ -11,9 +11,14 @@ def main_table_cpainfo(date):
     db_main = db.table_main(date)
     rq_cpainfo = rq.request_cpainfo()
     db_cpainfo = db.table_cpainfo(date)
-    db_cpainfo_overseas = db.table_cpainfo_overseas(date)
-    db_cpainfo_duty = db.table_cpainfo_duty(date)
-    db_cpainfo_party = db.table_cpainfo_party(date)
+    
+    db_cpainfo_otherqualis = db.table_cpainfo_otherqualis(date)
+    db_cpainfo_overseasqualis = db.table_cpainfo_overseasqualis(date)
+    db_cpainfo_rewards = db.table_cpainfo_rewards(date)
+    db_cpainfo_cpaorgan = db.table_cpainfo_cpaorgan(date)
+    db_cpainfo_otherorgan = db.table_cpainfo_otherorgan(date)
+    db_cpainfo_congress = db.table_cpainfo_congress(date)
+    db_cpainfo_otherparty = db.table_cpainfo_otherparty(date)
     
     selections = db_cpainfo.func_select_cpainfo() 
     for s in range(90000,len(selections),1):
@@ -26,22 +31,44 @@ def main_table_cpainfo(date):
         req_dt, data = rq_cpainfo.func_parse_cpa_basic(data)
         db_cpainfo.func_write_table((selection[0], selection[0] + '_' + req_dt[0]+ '_' + req_dt[12],) + req_dt)
         
-        infos, data = rq_cpainfo.func_parse_cpa_other(data)
+        infos, data = rq_cpainfo.func_parse_cpa_otherqualis(data)
         for info in infos:
-            db_cpainfo_overseas.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
+            db_cpainfo_otherqualis.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
         db_main.func_update(selection[0],'no_subinfo',len(infos))
 
-        infos, data = rq_cpainfo.func_parse_cpa_duty(data)
+        infos, data = rq_cpainfo.func_parse_cpa_overseasqualis(data)
         for info in infos:
-            db_cpainfo_duty.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
+            db_cpainfo_overseasqualis.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
         db_main.func_update(selection[0],'pages_subinfo',len(infos))
 
-        infos, data = rq_cpainfo.func_parse_cpa_party(data)
+        infos, data = rq_cpainfo.func_parse_cpa_rewards(data)
         for info in infos:
-            db_cpainfo_party.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
-        db_main.func_update(selection[0],'subinfo_NY',len(infos))        
+            db_cpainfo_rewards.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
+        db_main.func_update(selection[0],'subinfo_NY',len(infos))  
+        
+        infos, data = rq_cpainfo.func_parse_cpa_cpaorgan(data)
+        for info in infos:
+            db_cpainfo_cpaorgan.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
+        db_main.func_update(selection[0],'cpainfo',len(infos))
+
+        infos, data = rq_cpainfo.func_parse_cpa_otherorgan(data)
+        for info in infos:
+            db_cpainfo_otherorgan.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
+        db_main.func_update(selection[0],'pages_cpainfo',len(infos))
+
+        infos, data = rq_cpainfo.func_parse_cpa_congress(data)
+        for info in infos:
+            db_cpainfo_congress.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
+        db_main.func_update(selection[0],'cpainfo_NY',len(infos))          
+        
+        infos, data = rq_cpainfo.func_parse_cpa_otherparty(data)
+        for info in infos:
+            db_cpainfo_otherparty.func_write_table((selection[0], req_dt[12],  selection[0]+'_'+req_dt[12]+'_'+info[0],code,)+info)
+        db_main.func_update(selection[0],'no_overseasbranch',len(infos))  
+        
+        
         if len(data)  > 2200:
-            with open(fl.html_path  + code +".txt", "w", encoding='utf-8') as text_file:
+            with open(fl.html_path  + req_dt[12] +".txt", "w", encoding='utf-8') as text_file:
                 text_file.write(data)
         
 

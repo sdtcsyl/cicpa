@@ -281,6 +281,13 @@ class request_basic(cls_request):
         
         return  data10, data2
 
+#    def func_parse_cpa_otherqualis(self, data): ###取得国内其他专业资格 
+#        dt = re.findall(r'<tableid=\'gntable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>取得国内其他执业资格名称</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>(.*?)</table>', data, re.S)
+#        if len(dt)!=0:
+#            dt = re.findall(r'<tr><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', dt[0], re.S)
+#        data = re.sub(r'<tableid=\'gntable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>取得国内其他执业资格名称</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>(.*?)</table>',r'',data,re.S)
+#        return dt, data
+    
     def func_parse_basic_p_qualifications(self, data2):     
         ### 其他职业资格
         data2 = re.sub(r'</table></td></tr></tbody><tbody[^>]*><tr><td[^>]*>取得其他执业资质</td></tr><tr><td[^>]*><tableclass="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>取得的其他执业资质名称</td><td[^>]*>资格取得时间</td><td[^>]*>批准机关</td></tr>',r'',data2,re.S)  #去分所表表头
@@ -1155,10 +1162,10 @@ class request_cpainfo(cls_request):
             dt = dt[0:19] + list(dt_a[0][0:2]+dt_a[0][3:5])
         return tuple(dt), data2
         
-    def func_parse_cpa_other(self, data):
-        dt = re.findall('<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
-        data = re.sub('<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>',r'',data,re.S)
-        return tuple(dt), data
+#    def func_parse_cpa_other(self, data):
+#        dt = re.findall('<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+#        data = re.sub('<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>',r'',data,re.S)
+#        return tuple(dt), data
 
 #    def func_parse_cpa_cpa(self, data):
 #        data = re.sub(r'<tableid=\'lstable\'class="detail_table"cellspacing=\'0\'cellpadding=\'0\'width=\'100%\'align=\'center\'border=\'1\'><trclass="data_tb_td"align=\'center\'><tdbgcolor="#DCDCDC"width="5%">序号</td><tdbgcolor="#DCDCDC"width="30%">任职协会</td><tdbgcolor="#DCDCDC"width="20%">任职期间</td><tdbgcolor="#DCDCDC"width="15%">理事会届次</td><tdbgcolor="#DCDCDC"width="30%">具体职务（理事或常务理事）</td></tr>',r'',data,re.S)
@@ -1166,18 +1173,68 @@ class request_cpainfo(cls_request):
 #        data = re.sub(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr></table></td></tr>',r'',data,re.S)
 #        return tuple(dt), data
     
-    def func_parse_cpa_duty(self, data):
-        data = re.sub(r'<tableid=\'wytable\'class="detail_table"cellspacing=\'0\'cellpadding=\'0\'width=\'100%\'align=\'center\'border=\'1\'><trclass="data_tb_td"align=\'center\'><tdbgcolor="#DCDCDC"width="5%">序号</td><tdbgcolor="#DCDCDC"width="30%">任职协会</td><tdbgcolor="#DCDCDC"width="20%">任职期间</td><tdbgcolor="#DCDCDC"width="30%">专业委员会名称</td><tdbgcolor="#DCDCDC"width="15%">担任职务</td></tr>',r'',data,re.S)
-        dt = re.findall(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
-        data = re.sub(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>',r'',data,re.S)
-        return tuple(dt), data
+#    def func_parse_cpa_duty(self, data):
+#        data = re.sub(r'<tableid=\'wytable\'class="detail_table"cellspacing=\'0\'cellpadding=\'0\'width=\'100%\'align=\'center\'border=\'1\'><trclass="data_tb_td"align=\'center\'><tdbgcolor="#DCDCDC"width="5%">序号</td><tdbgcolor="#DCDCDC"width="30%">任职协会</td><tdbgcolor="#DCDCDC"width="20%">任职期间</td><tdbgcolor="#DCDCDC"width="30%">专业委员会名称</td><tdbgcolor="#DCDCDC"width="15%">担任职务</td></tr>',r'',data,re.S)
+#        dt = re.findall(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+#        data = re.sub(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>',r'',data,re.S)
+#        return tuple(dt), data
+#    
+#    def func_parse_cpa_party(self, data):
+#        data = re.sub(r'<tableid=\'mztable\'class="detail_table"cellspacing=\'0\'cellpadding=\'0\'width=\'100%\'align=\'center\'border=\'1\'><trclass="data_tb_td"align=\'center\'><tdbgcolor="#DCDCDC"width="5%">序号</td><tdbgcolor="#DCDCDC"width="35%">任职民主党派/工商联</td><tdbgcolor="#DCDCDC"width="20%">任职期间</td><tdbgcolor="#DCDCDC"width="25%">加入时间</td><tdbgcolor="#DCDCDC"width="15%">担任职务</td></tr>',r'',data,re.S)
+#        dt = re.findall(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
+#        data = re.sub(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td></tr>',r'',data,re.S)
+#        return tuple(dt), data   
+
+
+    def func_parse_cpa_otherqualis(self, data): ###取得国内其他专业资格 
+        dt = re.findall(r'<tableid=\'gntable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>取得国内其他执业资格名称</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>(.*?)</table>', data, re.S)
+        if len(dt)!=0:
+            dt = re.findall(r'<tr><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', dt[0], re.S)
+        data = re.sub(r'<tableid=\'gntable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>取得国内其他执业资格名称</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>(.*?)</table>',r'',data,re.S)
+        return dt, data
     
-    def func_parse_cpa_party(self, data):
-        data = re.sub(r'<tableid=\'mztable\'class="detail_table"cellspacing=\'0\'cellpadding=\'0\'width=\'100%\'align=\'center\'border=\'1\'><trclass="data_tb_td"align=\'center\'><tdbgcolor="#DCDCDC"width="5%">序号</td><tdbgcolor="#DCDCDC"width="35%">任职民主党派/工商联</td><tdbgcolor="#DCDCDC"width="20%">任职期间</td><tdbgcolor="#DCDCDC"width="25%">加入时间</td><tdbgcolor="#DCDCDC"width="15%">担任职务</td></tr>',r'',data,re.S)
-        dt = re.findall(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td></tr>', data, re.S)
-        data = re.sub(r'<tr><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><tdalign=\'center\'>([^<]*)</td><td>([^<]*)</td></tr>',r'',data,re.S)
-        return tuple(dt), data   
+    def func_parse_cpa_overseasqualis(self, data): ###取得境外资格信息 
+        dt = re.findall(r'<tableid=\'jwtable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>境外资格中文名称</td><td[^>]*>英文名称（简称）</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>(.*?)</table>', data, re.S)
+        if len(dt)!=0:
+            dt = re.findall(r'<tr><td[^>]*>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', dt[0], re.S)
+        data = re.sub(r'<tableid=\'jwtable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>境外资格中文名称</td><td[^>]*>英文名称（简称）</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>(.*?)</table>',r'',data,re.S)
+        return dt, data
     
+    def func_parse_cpa_rewards(self, data):###奖励信息 
+        dt = re.findall(r'<tableid=\'jltable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>奖励种类</td><td[^>]*>奖励时间</td><td[^>]*>奖励部门</td><td[^>]*>奖励原因</td></tr>(.*?)</table>', data, re.S)
+        if len(dt)!=0:
+            dt = re.findall(r'<tr><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', dt[0], re.S)
+        data = re.sub(r'<tableid=\'jltable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>奖励种类</td><td[^>]*>奖励时间</td><td[^>]*>奖励部门</td><td[^>]*>奖励原因</td></tr>(.*?)</table>',r'',data,re.S)
+        return dt, data    
+
+    def func_parse_cpa_cpaorgan(self, data):###担任中注协或省协会理事 
+        dt = re.findall(r'<tableid=\'lstable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>任职协会</td><td[^>]*>任职期间</td><td[^>]*>理事会届次</td><td[^>]*>具体职务（理事或常务理事）</td></tr>(.*?)</table>', data, re.S)
+        if len(dt)!=0:
+            dt = re.findall(r'<tr><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', dt[0], re.S)
+        data = re.sub(r'<tableid=\'lstable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>任职协会</td><td[^>]*>任职期间</td><td[^>]*>理事会届次</td><td[^>]*>具体职务（理事或常务理事）</td></tr>(.*?)</table>',r'',data,re.S)
+        return dt, data  
+
+    def func_parse_cpa_otherorgan(self, data):###担任专门委员会委员 
+        dt = re.findall(r'<tableid=\'wytable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>任职协会</td><td[^>]*>任职期间</td><td[^>]*>专业委员会名称</td><td[^>]*>担任职务</td></tr>(.*?)</table>', data, re.S)
+        if len(dt)!=0:
+            dt = re.findall(r'<tr><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', dt[0], re.S)
+        data = re.sub(r'<tableid=\'wytable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>任职协会</td><td[^>]*>任职期间</td><td[^>]*>专业委员会名称</td><td[^>]*>担任职务</td></tr>(.*?)</table>',r'',data,re.S)
+        return dt, data  
+
+    def func_parse_cpa_congress(self, data):###担任人大代表、政协委员
+        dt = re.findall(r'<tableid=\'rdtable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>所在人大/政协</td><td[^>]*>任职期间</td><td[^>]*>人大/政协届次</td><td[^>]*>担任职务</td></tr>(.*?)</table>', data, re.S)
+        if len(dt)!=0:
+            dt = re.findall(r'<tr><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', dt[0], re.S)
+        data = re.sub(r'<tableid=\'rdtable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>所在人大/政协</td><td[^>]*>任职期间</td><td[^>]*>人大/政协届次</td><td[^>]*>担任职务</td></tr>(.*?)</table>',r'',data,re.S)
+        return dt, data      
+
+    def func_parse_cpa_otherparty(self, data):###担任民主党派、工商联职务 
+        dt = re.findall(r'<tableid=\'mztable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>任职民主党派/工商联</td><td[^>]*>任职期间</td><td[^>]*>加入时间</td><td[^>]*>担任职务</td></tr>(.*?)</table>', data, re.S)
+        if len(dt)!=0:
+            dt = re.findall(r'<tr><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td><td[^>]*>([^<]*)</td><td>([^<]*)</td></tr>', dt[0], re.S)
+        data = re.sub(r'<tableid=\'mztable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>任职民主党派/工商联</td><td[^>]*>任职期间</td><td[^>]*>加入时间</td><td[^>]*>担任职务</td></tr>(.*?)</table>',r'',data,re.S)
+        return dt, data      
+        
     
 '''///////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////

@@ -773,9 +773,28 @@ class table_cpainfo(table):
         res =  self.exe_sql_w_return(sql)
         return res   
     
-class table_cpainfo_overseas(table):
+class table_cpainfo_otherqualis(table):
     def __init__(self, db):
-        super(table_cpainfo_overseas,self).__init__(db,'cpainfo_overseas')
+        super(table_cpainfo_otherqualis,self).__init__(db,'cpainfo_otherqualis')
+        self.fields = ['gsbm', ##公司编号
+                       'cpano',##注册会计师证书编号
+                       'id',
+                        'zsmc',     ##注师名称
+                        'bh',
+                        'qtzg',     ##取得国内其他执业资格名称
+                    
+                        'qdsj',     ##取得时间
+                        'zsbh',     ##证书编号
+                        'qdsd'      ##取得地点
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+  
+class table_cpainfo_overseasqualis(table):
+    def __init__(self, db):
+        super(table_cpainfo_overseasqualis,self).__init__(db,'cpainfo_overseasqualis')
         self.fields = ['gsbm', ##公司编号
                        'cpano',##注册会计师证书编号
                        'id',
@@ -793,10 +812,107 @@ class table_cpainfo_overseas(table):
         #self.add_foreign_key('gsbm','main','swsbm')
         self.exe_sql(self.sql_create_table())
 
-    def func_select_cpainfo(self):
-        sql = 'select gsbm, web_xm from table_cpa'
-        res =  self.exe_sql_w_return(sql)
-        return res   
+      
+class table_cpainfo_rewards(table):
+    def __init__(self, db):
+        super(table_cpainfo_rewards,self).__init__(db,'cpainfo_rewards')
+        self.fields = ['gsbm', ##公司编号
+                       'cpano',##注册会计师证书编号
+                       'id',
+                        'zsmc',     ##注师名称
+                        'bh',
+                        'jlzl',     ##奖励种类
+                        
+                        'jlsj',     ##奖励时间
+                        'jlbm',     ##奖励部门
+                        'jlyy'     ##奖励原因
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+    
+      
+class table_cpainfo_cpaorgan(table):
+    def __init__(self, db):
+        super(table_cpainfo_cpaorgan,self).__init__(db,'cpainfo_cpaorgan')
+        self.fields = ['gsbm', ##公司编号
+                       'cpano',##注册会计师证书编号
+                       'id',
+                        'zsmc',     ##注师名称
+                        'bh',
+                        'rzxh',     ##任职协会
+                        
+                        'rzqj',     ##任职期间
+                        'lsjc',     ##理事会届次
+                        'drzw'      ##具体职务（理事或常务理事
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+    
+      
+class table_cpainfo_otherorgan(table):
+    def __init__(self, db):
+        super(table_cpainfo_otherorgan,self).__init__(db,'cpainfo_otherorgan')
+        self.fields = ['gsbm', ##公司编号
+                       'cpano',##注册会计师证书编号
+                       'id',
+                        'zsmc',     ##注师名称
+                        'bh',
+                        'rzxh',     ##任职协会
+                        
+                        'rzqj',     ##任职期间
+                        'zywyhmc',     ##专业委员会名称
+                        'drzw'      ##担任职务
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+    
+      
+class table_cpainfo_congress(table):
+    def __init__(self, db):
+        super(table_cpainfo_congress,self).__init__(db,'cpainfo_congress')
+        self.fields = ['gsbm', ##公司编号
+                       'cpano',##注册会计师证书编号
+                       'id',
+                        'zsmc',     ##注师名称
+                        'bh',
+                        'szrdzx',     ##所在人大/政协
+                        
+                        'rzqj',     ##任职期间
+                        'rdzxjc',     ##人大/政协届次
+                        'drzw'      ##担任职务
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+    
+class table_cpainfo_otherparty(table):
+    def __init__(self, db):
+        super(table_cpainfo_otherparty,self).__init__(db,'cpainfo_otherparty')
+        self.fields = ['gsbm', ##公司编号
+                       'cpano',##注册会计师证书编号
+                       'id',
+                        'zsmc',     ##注师名称
+                        'bh',
+                        'rzmzdpgsl',     ##任职民主党派/工商联
+                        
+                        'rzqj',     ##任职期间
+                        'jrsj',     ##加入时间
+                        'drzw'     ##担任职务
+                        ]   ##
+        self.types = ['varchar(2)']*len(self.fields)
+        self.primary_key = ['id']
+        #self.add_foreign_key('gsbm','main','swsbm')
+        self.exe_sql(self.sql_create_table())
+
+
 
 
 #class table_cpainfo_cpa(table):
@@ -821,54 +937,30 @@ class table_cpainfo_overseas(table):
 #        sql = 'select gsbm, web_xm from table_cpa'
 #        res =  self.exe_sql_w_return(sql)
 #        return res   
-
-class table_cpainfo_duty(table):
-    def __init__(self, db):
-        super(table_cpainfo_duty,self).__init__(db,'cpainfo_duty')
-        self.fields = ['gsbm', ##公司编号
-                       'cpano',##注册会计师证书编号
-                       'id',
-                        'zsmc',     ##注师名称
-                        'bh',
-                        'rzxh',     ##任职协会
-                        
-                        'rzqj',     ##任职期间
-                        'zywyhmc',     ##专业委员会名称
-                        'drzw'     ##担任职务
-                        ]   ##
-        self.types = ['varchar(2)']*len(self.fields)
-        self.primary_key = ['id']
-        #self.add_foreign_key('gsbm','main','swsbm')
-        self.exe_sql(self.sql_create_table())
-
-    def func_select_cpainfo(self):
-        sql = 'select gsbm, web_xm from table_cpa'
-        res =  self.exe_sql_w_return(sql)
-        return res   
-    
-class table_cpainfo_party(table):
-    def __init__(self, db):
-        super(table_cpainfo_party,self).__init__(db,'cpainfo_party')
-        self.fields = ['gsbm', ##公司编号
-                       'cpano',##注册会计师证书编号
-                       'id',
-                        'zsmc',     ##注师名称
-                        'bh',
-                        'rzmzdpgsl',     ##任职民主党派/工商联
-                        
-                        'rzqj',     ##任职期间
-                        'jrsj',     ##加入时间
-                        'drzw'     ##担任职务
-                        ]   ##
-        self.types = ['varchar(2)']*len(self.fields)
-        self.primary_key = ['id']
-        #self.add_foreign_key('gsbm','main','swsbm')
-        self.exe_sql(self.sql_create_table())
-
-    def func_select_cpainfo(self):
-        sql = 'select gsbm, web_xm from table_cpa'
-        res =  self.exe_sql_w_return(sql)
-        return res   
+#
+#class table_cpainfo_duty(table):
+#    def __init__(self, db):
+#        super(table_cpainfo_duty,self).__init__(db,'cpainfo_duty')
+#        self.fields = ['gsbm', ##公司编号
+#                       'cpano',##注册会计师证书编号
+#                       'id',
+#                        'zsmc',     ##注师名称
+#                        'bh',
+#                        'rzxh',     ##任职协会
+#                        
+#                        'rzqj',     ##任职期间
+#                        'zywyhmc',     ##专业委员会名称
+#                        'drzw'     ##担任职务
+#                        ]   ##
+#        self.types = ['varchar(2)']*len(self.fields)
+#        self.primary_key = ['id']
+#        #self.add_foreign_key('gsbm','main','swsbm')
+#        self.exe_sql(self.sql_create_table())
+#
+#    def func_select_cpainfo(self):
+#        sql = 'select gsbm, web_xm from table_cpa'
+#        res =  self.exe_sql_w_return(sql)
+#        return res   
 
 
 
