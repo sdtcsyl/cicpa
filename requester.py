@@ -197,7 +197,7 @@ class request_basic(cls_request):
         data1 = re.sub('<scripttype="text/javascript">.*EXCEL"id=\'export\'/></td></tr></table>',r'',data,re.S) #去头
         
         ### 去掉 html tail
-        data2 = re.sub('</table></td></tr></tbody></table></td></tr><TR><TDbackground=.*</script>',r'',data1,re.S)  #去尾
+        data2 = re.sub('</td></tr></tbody></table></td></tr><TR><TDbackground=.*</script>',r'',data1,re.S)  #去尾
         
         ### basic info && 去掉 html basic info 
         data3 = re.findall(r'<tableclass="detail_table"[^>]*id="detailtb"><tr><td[^>]*>[^<]*</td></tr><tr><td[^>]*>基本信息</td></tr><tr><td[^>]*>会计师事务所名称</td><td[^>]*>([^<]*)</td><td[^>]*>证书编号</td><td[^>]*>([^<]*)</td></tr><tr><tdclass="tdl">联系人</td><td[^>]*>([^<]*)</td><tdclass="tdl">联系电话</td><tdclass="data_tb_content">([^<]*)</td></tr><tr><tdclass="tdl">办公地址</td><td[^>]*>([^<]*)</td><tdclass="tdl">传真</td><tdclass="data_tb_content">([^<]*)</td></tr><tr><tdclass="tdl">通讯地址</td><td[^>]*>([^<]*)</td><tdclass="tdl">邮政编码</td><tdclass="data_tb_content">([^<]*)</td></tr><tr><tdclass="tdl">电子邮箱</td><td[^>]*>([^<]*)</td><tdclass="tdl">网址</td><tdclass="data_tb_content">([^<]*)</td></tr>',data2,re.S)  #基本信息
@@ -272,41 +272,28 @@ class request_basic(cls_request):
         
     def func_parse_basic_p_subsidiaries(self, data2):
         ### 分所信息
-        data2 = re.sub(r'<tr><tdclass="table_header"[^>]*>设立分所情况</td></tr><tr><td[^>]*><table[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>分所名称</td><td[^>]*>分所负责人</td><td[^>]*>电话</td><td[^>]*>电子邮箱</td></tr>',r'',data2,re.S)  #去分所表表头
-        
-        data10 = re.findall(r'<tr><td[^>]*>([^<]*)</td><td[^>]*><ahref=([^>]*)>([^<]*)</a></td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td></tr>',data2,re.S)  #登记信息 
-        
-        data2 = re.sub(r'<tr><td[^>]*>([^<]*)</td><td[^>]*><ahref=([^>]*)>([^<]*)</a></td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td></tr>',r'',data2,re.S)  #去登记信息 
-        data2 = re.sub(r'<tr><td[^>]*>([^<]*)</td><td[^>]*><ahref=([^>]*)>([^<]*)</a></td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td></tr>',r'',data2,re.S)  #去登记信息 
-        
-        return  data10, data2
-
-#    def func_parse_cpa_otherqualis(self, data): ###取得国内其他专业资格 
-#        dt = re.findall(r'<tableid=\'gntable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>取得国内其他执业资格名称</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>(.*?)</table>', data, re.S)
-#        if len(dt)!=0:
-#            dt = re.findall(r'<tr><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td></tr>', dt[0], re.S)
-#        data = re.sub(r'<tableid=\'gntable\'class="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>取得国内其他执业资格名称</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>(.*?)</table>',r'',data,re.S)
-#        return dt, data
+        dt = re.findall(r'<table[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>分所名称</td><td[^>]*>分所负责人</td><td[^>]*>电话</td><td[^>]*>电子邮箱</td></tr>(.*?)</table>', data2, re.S)
+        if len(dt)!=0:
+            dt = re.findall(r'<tr><td[^>]*>([^<]*)</td><td[^>]*><ahref=([^>]*)>([^<]*)</a></td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td[^>]*>([^<]*)</td></tr>', dt[0], re.S)
+        data = re.sub(r'<table[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>分所名称</td><td[^>]*>分所负责人</td><td[^>]*>电话</td><td[^>]*>电子邮箱</td></tr>(.*?)</table>',r'',data2,re.S)
+        return dt, data
     
     def func_parse_basic_p_qualifications(self, data2):     
-        ### 其他职业资格
-        data2 = re.sub(r'</table></td></tr></tbody><tbody[^>]*><tr><td[^>]*>取得其他执业资质</td></tr><tr><td[^>]*><tableclass="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>取得的其他执业资质名称</td><td[^>]*>资格取得时间</td><td[^>]*>批准机关</td></tr>',r'',data2,re.S)  #去分所表表头
-        
-        data11 = re.findall(r'<tr><td[^>]*>([^>]*)</td><td[^>]*>([^>]*)</td><td[^>]*>([^>]*)</td><td[^>]*>([^>]*)</td></tr>',data2,re.S)  #登记信息 
-        
-        data2 = re.sub(r'<tr><td[^>]*>([^>]*)</td><td[^>]*>([^>]*)</td><td[^>]*>([^>]*)</td><td[^>]*>([^>]*)</td></tr>',r'',data2,re.S)  #去登记信息 
-        
-        return  data11, data2
-     
+        ### 其他职业资格     
+        dt = re.findall(r'<table[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>取得的其他执业资质名称</td><td[^>]*>资格取得时间</td><td[^>]*>批准机关</td></tr>(.*?)</table>', data2, re.S)
+        if len(dt)!=0:
+            dt = re.findall(r'<tr><td[^>]*>([^>]*)</td><td[^>]*>([^>]*)</td><td[^>]*>([^>]*)</td><td[^>]*>([^>]*)</td></tr>', dt[0], re.S)
+        data = re.sub(r'<table[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>取得的其他执业资质名称</td><td[^>]*>资格取得时间</td><td[^>]*>批准机关</td></tr>(.*?)</table>',r'',data2,re.S)
+        return dt, data    
+    
+    
     def func_parse_basic_p_overseascpa(self, data2):
-        ### 海外职业资格
-        data2 = re.sub(r'</table></td></tr></tbody><tbody[^>]*><tr><td[^>]*>取得境外资格注册会计师情况</td></tr><tr><td[^>]*><tableclass="detail_table"[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>注师名称</td><td[^>]*>境外资格中文名称</td><td[^>]*>英文名称（简称）</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>',r'',data2,re.S)  #去分所表表头
-        
-        data12 = re.findall(r'<tr><td[^>]*>([^>]*)</td><td><ahref=([^>]*)>([^>]*)</a></td><td>([^>]*)</td><td>([^>]*)</td><td[^>]*>([^>]*)</td><td>([^>]*)</td><td>([^>]*)</td></tr>',data2,re.S)  #登记信息 
-        
-        data2 = re.sub(r'<tr><td[^>]*>([^>]*)</td><td><ahref=([^>]*)>([^>]*)</a></td><td>([^>]*)</td><td>([^>]*)</td><td[^>]*>([^>]*)</td><td>([^>]*)</td><td>([^>]*)</td></tr>',r'',data2,re.S)  #去登记信息 
-
-        return  data12, data2    
+        ### 海外职业资格       
+        dt = re.findall(r'<table[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>注师名称</td><td[^>]*>境外资格中文名称</td><td[^>]*>英文名称（简称）</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>(.*?)</table>', data2, re.S)
+        if len(dt)!=0:
+            dt = re.findall(r'<tr><td[^>]*>([^>]*)</td><td><ahref=([^>]*)>([^>]*)</a></td><td>([^>]*)</td><td>([^>]*)</td><td[^>]*>([^>]*)</td><td>([^>]*)</td><td>([^>]*)</td></tr>', dt[0], re.S)
+        data = re.sub(r'<table[^>]*><tr[^>]*><td[^>]*>序号</td><td[^>]*>注师名称</td><td[^>]*>境外资格中文名称</td><td[^>]*>英文名称（简称）</td><td[^>]*>取得时间</td><td[^>]*>证书编号</td><td[^>]*>取得地点</td></tr>(.*?)</table>',r'',data2,re.S)
+        return dt, data 
         
     def func_parse_sub(self, data):
         data = data.replace('\n','')
